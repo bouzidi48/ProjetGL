@@ -9,7 +9,7 @@ namespace ProjetGL.Data
         SqlCommand command = new SqlCommand();
         public Data()
         {
-            connection.ConnectionString = $@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=D:\Othmane\4eme\DotNet\projet\ProjetGL\ProjetGL\Data\db_GL\db_GL.mdf;Integrated Security=True";
+            connection.ConnectionString = $@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=db_GL;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
             connection.Open();
             command.Connection = connection;
 
