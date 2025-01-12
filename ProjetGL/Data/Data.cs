@@ -5,19 +5,19 @@ namespace ProjetGL.Data
 {
     public class Data : IData
     {
-        SqlConnection connection = new SqlConnection();
-        SqlCommand command = new SqlCommand();
+        private BD bd;
+
         public Data()
         {
-            connection.ConnectionString = $@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=db_GL;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
-            connection.Open();
-            command.Connection = connection;
+            Bd = new BD();
 
         }
+        public BD Bd { get => bd; set => bd = value; }
+
         public void Add(Account account)
         {
-            command.CommandText = $@"insert into account values('{account.Login}','{account.Password}')";
-            command.ExecuteNonQuery();
+            Bd.Command.CommandText = $@"insert into account values('{account.Login}','{account.Password}')";
+            Bd.Command.ExecuteNonQuery();
         }
 
         public void Del(string login)
@@ -27,8 +27,8 @@ namespace ProjetGL.Data
 
         public bool Exist(string login)
         {
-            command.CommandText = $@"select * from account where login ='{login}'";
-            SqlDataReader rd = command.ExecuteReader();
+            Bd.Command.CommandText = $@"select * from account where login ='{login}'";
+            SqlDataReader rd = Bd.Command.ExecuteReader();
             if (rd.Read())
             {
                 rd.Close();
@@ -40,8 +40,8 @@ namespace ProjetGL.Data
 
         public Account Find(string login)
         {
-            command.CommandText = $@"select * from account where login ='{login}'";
-            SqlDataReader rd = command.ExecuteReader();
+            Bd.Command.CommandText = $@"select * from account where login ='{login}'";
+            SqlDataReader rd = Bd.Command.ExecuteReader();
             if (rd.Read())
             {
                 var account = new Account
@@ -59,8 +59,8 @@ namespace ProjetGL.Data
 
         public List<Account> GetAccounts()
         {
-            command.CommandText = "select * from account";
-            SqlDataReader rd = command.ExecuteReader();
+            Bd.Command.CommandText = "select * from account";
+            SqlDataReader rd = Bd.Command.ExecuteReader();
             List<Account> accounts = new List<Account>();
             while (rd.Read())
             {
@@ -76,8 +76,8 @@ namespace ProjetGL.Data
 
         public void Update(string login, Account newAccount)
         {
-            command.CommandText = $@"update account set login = '{newAccount.Login}', password = '{newAccount.Password}' where login = '{login}'";
-            command.ExecuteNonQuery();
+            Bd.Command.CommandText = $@"update account set login = '{newAccount.Login}', password = '{newAccount.Password}' where login = '{login}'";
+            Bd.Command.ExecuteNonQuery();
         }
     }
 }
