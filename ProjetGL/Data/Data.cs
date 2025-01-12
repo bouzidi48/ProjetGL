@@ -3,7 +3,7 @@ using ProjetGL.Models;
 
 namespace ProjetGL.Data
 {
-    public class DataAccount : IDataAccount
+    public class DataAccount : IData
     {
         SqlConnection connection = new SqlConnection();
         SqlCommand command = new SqlCommand();

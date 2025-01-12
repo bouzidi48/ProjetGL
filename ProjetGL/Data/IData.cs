@@ -3,7 +3,7 @@
 
 namespace ProjetGL.Data
 {
-    public interface IDataAccount
+    public interface IData
     {
         void Add(Account account);
         bool Exist(string login);
