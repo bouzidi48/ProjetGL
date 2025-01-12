@@ -1,53 +1,42 @@
-﻿using ProjetGL.Models;
+﻿
+using ProjetGL.Data;
+using ProjetGL.Interfaces;
 using ProjetGL.Models;
 
 namespace ProjetGL.Business
 {
 
-        public class AccountManager : IAccountManager
+    public class AccountManager : IAccountManager
+    {
+        IGestion_Account data = new Gestion_Account();
+        public void Add(Account account)
         {
-            static List<Account> liste = new List<Account>();
-            public AccountManager() { }
-            public void Add(Account account)
-            {
-                liste.Add(account);
-            }
+            data.Add(account);
+        }
 
-            public void Del(string login)
-            {
-                Account x = Find(login);
-                if (x != null)
-                    liste.Remove(x);
-            }
+        public void Del(string login)
+        {
+            data.Del(login);
+        }
 
-            public bool Exist(string login)
-            {
-                foreach (Account account in liste)
-                    if (account.Login == login)
-                        return true;
-                return false;
-            }
+        public bool Exist(string login)
+        {
+            return data.Exist(login);
+        }
 
-            public Account Find(string login)
-            {
-                foreach (Account account in liste)
-                {
-                    if (account.Login == login)
-                    {
-                        return account;
-                    }
-                }
-                return null;
-            }
-            public List<Account> GetAccounts()
-            {
-                return liste;
-            }
+        public Account Find(string login)
+        {
+            return data.Find(login);
+        }
 
-            public void Update(string login, Account newAccount)
-            {
-                Account x = Find(login);
-                x.Password = newAccount.Password;
-            }
+        public List<Account> GetAccounts()
+        {
+            return data.GetAccounts();
+        }
+
+        public void Update(string login, Account newAccount)
+        {
+            data.Update(login, newAccount);
         }
     }
+}

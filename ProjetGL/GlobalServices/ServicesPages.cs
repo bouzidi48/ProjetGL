@@ -1,19 +1,19 @@
 ﻿using ProjetGL.Business;
 using ProjetGL.Data;
+using ProjetGL.Interfaces;
 
 
 namespace ProjetGL.GlobalServices
 {
 
-        public static class ServicesPages
+    public static class ServicesPages
         {
-            public static IAccountManager manager;
+            public static IAccountManager managerAccount;
             //public static IDataAccount data ;
             static ServicesPages()
             {
-                //manager = new AccountManager(); //on instancie le service
-                manager = new AccountManagerV2(); //on instancie le service
-                                                  //data = new DataAccount();
+            //manager = new AccountManager(); //on instancie le service
+                managerAccount = new AccountManager(); //on instancie le service
             }
         }
     }

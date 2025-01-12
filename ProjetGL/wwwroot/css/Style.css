@@ -1,0 +1,25 @@
+﻿.layout {
+    display: grid;
+    grid-template-areas:
+        "A B "
+        "A B "
+        "A B ";
+    grid-template-columns: 20% 70%;
+    gap: 10px;
+}
+
+
+.div1 {
+    margin: 15px;
+    grid-area: A;
+}
+
+.div2 {
+    grid-area: B;
+}
+
+.pere > *:hover {
+    background-color: beige;
+    border-radius: 10px;
+    box-shadow: 2px 2px 2px 2px;
+}
