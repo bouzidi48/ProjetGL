@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using ProjetGL.Models;
 
 namespace ProjetGL.Data
 {
@@ -6,46 +7,77 @@ namespace ProjetGL.Data
     {
         SqlConnection connection = new SqlConnection();
         SqlCommand command = new SqlCommand();
-
         public Data()
         {
-            connection.ConnectionString = $@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=db_GL;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
+            connection.ConnectionString = $@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=BD;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
             connection.Open();
             command.Connection = connection;
+
+        }
+        public void Add(Account account)
+        {
+            command.CommandText = $@"insert into account values('{account.Login}','{account.Password}')";
+            command.ExecuteNonQuery();
         }
 
-
-
-        public void Add()
+        public void Del(string login)
         {
             throw new NotImplementedException();
         }
 
-        public void Delete()
+        public bool Exist(string login)
         {
-            throw new NotImplementedException();
+            command.CommandText = $@"select * from account where login ='{login}'";
+            SqlDataReader rd = command.ExecuteReader();
+            if (rd.Read())
+            {
+                rd.Close();
+                return true;
+            }
+            rd.Close();
+            return false;
+        }
+
+        public Account Find(string login)
+        {
+            command.CommandText = $@"select * from account where login ='{login}'";
+            SqlDataReader rd = command.ExecuteReader();
+            if (rd.Read())
+            {
+                var account = new Account
+                {
+                    Login = rd["login"].ToString(),
+                    Password = rd["password"].ToString()
+                };
+                rd.Close();
+                return account;
+            }
+            rd.Close();
+            return null;
         }
 
 
-        public bool Exist()
+        public List<Account> GetAccounts()
         {
-            throw new NotImplementedException();
+            command.CommandText = "select * from account";
+            SqlDataReader rd = command.ExecuteReader();
+            List<Account> accounts = new List<Account>();
+            while (rd.Read())
+            {
+                accounts.Add(new Account
+                {
+                    Login = rd["login"].ToString(),
+                    Password = rd["password"].ToString()
+                });
+            }
+            rd.Close();
+            return accounts;
         }
 
-        public void Find(string login)
+        public void Update(string login, Account newAccount)
         {
-            throw new NotImplementedException();
+            command.CommandText = $@"update account set login = '{newAccount.Login}', password = '{newAccount.Password}' where login = '{login}'";
+            command.ExecuteNonQuery();
         }
-
-        public void GetAccounts()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update()
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }
