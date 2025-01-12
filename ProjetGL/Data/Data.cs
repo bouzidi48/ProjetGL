@@ -3,11 +3,11 @@ using ProjetGL.Models;
 
 namespace ProjetGL.Data
 {
-    public class DataAccount : IData
+    public class Data : IData
     {
         SqlConnection connection = new SqlConnection();
         SqlCommand command = new SqlCommand();
-        public DataAccount()
+        public Data()
         {
             connection.ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=bd_GL;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
             connection.Open();
