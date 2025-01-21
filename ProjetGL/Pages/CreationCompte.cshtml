@@ -1,0 +1,73 @@
+﻿@page
+@model ProjetGL.Pages.CreationCompteModel
+
+@using ProjetGL.Models
+@{
+    Layout = Request.Headers["X-Requested-With"] == "XMLHttpRequest" ? null : "_Layout";
+}
+
+<h1 class="text-primary">Responsable</h1>
+
+<div class="d-flex">
+    
+    <!-- Sidebar -->
+    <div class="col-2 offset-0">
+        <nav class="bg-primary text-light sidebar vh-100 p-3">
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a href="#" class="nav-link text-light" onclick="loadContent('/Admin')">Fonctionnalite1</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="#" class="nav-link text-light" onclick="loadContent('/Admin')">Fonctionnalite2</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="#" class="nav-link text-light" onclick="loadContent('/Admin')">Fonctionnalite3</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="/Authentication" class="nav-link text-light">Se déconnecter</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="#" class="nav-link text-light" onclick="loadContent('/CreationCompte')">Creation du compte</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="col-9">
+
+        <div class="p-3 bg-light vh-100">
+            <h1 class="text-danger">Creation de compte</h1>
+
+            <form method="post" class="col-4 offset-3">
+                <div class="form-group">
+                    <label class="control-label">Username</label>
+                    <input type="text" asp-for="Account.Username" class="form-control" />
+                    <span asp-validation-for="Account.Username" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Password</label>
+                    <input type="text" asp-for="Account.Password" class="form-control" />
+                    <span asp-validation-for="Account.Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Role</label>
+                    <select asp-for="Account.UserRole" asp-items="Model.Roles" class="form-control">
+                    </select>
+                    <span asp-validation-for="Account.UserRole" class="text-danger"></span>
+                </div>
+
+                <span class="text-success">
+                    @Model.Msg
+                </span>
+
+                <div class="m-2">
+                    <button type="submit" class="btn btn-success">S'inscrire</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+

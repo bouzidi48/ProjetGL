@@ -26,8 +26,9 @@ namespace ProjetGL.Pages
 
                 if (ServicesPages.managerAccount.Exist(account.Username) == false)
                 {// s'il n'est pas dans la liste
-
+                    account.UserRole=Role.Fournisseur;
                     ServicesPages.managerAccount.Add(account);
+
                     Msg = "account added with success";
                 }
                 else

@@ -2,7 +2,9 @@
 @model ProjetGL.Pages.InscriptionModel
 @using ProjetGL.Models;
 @{
+    Layout = Request.Headers["X-Requested-With"] == "XMLHttpRequest" ? null : "_Layout";
 }
+
 
 <h1 class="text-danger">Inscription</h1>
 <form method="post" class="col-4 offset-3">
@@ -19,12 +21,7 @@
         <span asp-validation-for="Account.Password" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
-        <label class="control-label">Role</label>
-        <select asp-for="Account.UserRole" asp-items="Html.GetEnumSelectList<Role>()" class="form-control">
-        </select>
-        <span asp-validation-for="Account.UserRole" class="text-danger"></span>
-    </div>
+
 
     <span class="text-success">
         @Model.Msg
