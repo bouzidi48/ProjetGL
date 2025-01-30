@@ -7,7 +7,7 @@ namespace ProjetGL.GlobalServices
 {
 
     public static class ServicesPages
-        {
+    {
             public static IAccountManager managerAccount;
             //public static IDataAccount data ;
             static ServicesPages()
@@ -15,5 +15,5 @@ namespace ProjetGL.GlobalServices
             //manager = new AccountManager(); //on instancie le service
                 managerAccount = new AccountManager(); //on instancie le service
             }
-        }
     }
+}

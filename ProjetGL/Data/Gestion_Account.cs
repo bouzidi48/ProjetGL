@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using ProjetGL.GlobalServices;
 using ProjetGL.Interfaces;
 using ProjetGL.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -7,21 +8,16 @@ namespace ProjetGL.Data
 {
     public class Gestion_Account : IGestion_Account
     {
-        private BD bd;
-
         public Gestion_Account()
         {
-            Bd = new BD();
             Account.cp = GetMaxIdUser();
         }
 
 
-        public BD Bd { get => bd; set => bd = value; }
-
         public void Add(Account account)
         {
-            Bd.Command.CommandText = $@"insert into account values('{account.Id}','{account.Username}','{account.Password}','{account.UserRole}')";
-            Bd.Command.ExecuteNonQuery();
+            GlobalBD.Bd.Command.CommandText = $@"insert into account values('{account.Id}','{account.Username}','{account.Password}','{account.UserRole}')";
+            GlobalBD.Bd.Command.ExecuteNonQuery();
         }
 
         public void Del(string login)
@@ -31,8 +27,8 @@ namespace ProjetGL.Data
 
         public bool Exist(string username)
         {
-            Bd.Command.CommandText = $@"select * from account where Username ='{username}'";
-            SqlDataReader rd = Bd.Command.ExecuteReader();
+			GlobalBD.Bd.Command.CommandText = $@"select * from account where Username ='{username}'";
+            SqlDataReader rd = GlobalBD.Bd.Command.ExecuteReader();
             if (rd.Read())
             {
                 rd.Close();
@@ -44,8 +40,8 @@ namespace ProjetGL.Data
 
         public Account Find(string Username)
         {
-            Bd.Command.CommandText = $@"select * from account where Username ='{Username}'";
-            SqlDataReader rd = Bd.Command.ExecuteReader();
+			GlobalBD.Bd.Command.CommandText = $@"select * from account where Username ='{Username}'";
+            SqlDataReader rd = GlobalBD.Bd.Command.ExecuteReader();
             if (rd.Read())
             {
                 var account = new Account();
@@ -64,8 +60,8 @@ namespace ProjetGL.Data
 
         public List<Account> GetAccounts()
         {
-            Bd.Command.CommandText = "select * from account";
-            SqlDataReader rd = Bd.Command.ExecuteReader();
+			GlobalBD.Bd.Command.CommandText = "select * from account";
+            SqlDataReader rd = GlobalBD.Bd.Command.ExecuteReader();
             List<Account> accounts = new List<Account>();
             while (rd.Read())
             {
@@ -81,8 +77,8 @@ namespace ProjetGL.Data
 
         public void Update(string Username, Account newAccount)
         {
-            Bd.Command.CommandText = $@"update account set Username = '{newAccount.Username}', Password = '{newAccount.Password}' where Username = '{Username}'";
-            Bd.Command.ExecuteNonQuery();
+			GlobalBD.Bd.Command.CommandText = $@"update account set Username = '{newAccount.Username}', Password = '{newAccount.Password}' where Username = '{Username}'";
+			GlobalBD.Bd.Command.ExecuteNonQuery();
         }
 
 
@@ -91,10 +87,10 @@ namespace ProjetGL.Data
             try
             {
                 int maxId = 0;
-                // Requête pour récupérer le maximum de IdUser
-                Bd.Command.CommandText = $@"SELECT ISNULL(MAX(Id), 0) FROM account";
+				// Requête pour récupérer le maximum de IdUser
+				GlobalBD.Bd.Command.CommandText = $@"SELECT ISNULL(MAX(Id), 0) FROM account";
 
-                SqlDataReader rs = Bd.Command.ExecuteReader();
+                SqlDataReader rs = GlobalBD.Bd.Command.ExecuteReader();
                 if (rs.Read() == true)
                 {
                     maxId = (int)rs[0];

@@ -9,7 +9,7 @@ namespace ProjetGL.Data
 
         public BD()
         {
-            Connection.ConnectionString = $@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=BDGL;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
+            Connection.ConnectionString = $@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=db_GL;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
             Connection.Open();
             Command.Connection = Connection;
         }
