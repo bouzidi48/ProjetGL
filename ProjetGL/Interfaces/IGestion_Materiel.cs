@@ -14,8 +14,8 @@ namespace ProjetGL.Interfaces
 		void AddImprimante(Imprimante imprimante);
 		void DelImprimante(int id);
 		bool ExistImprimante(int id);
-		Ordinateur FindImprimante(int id);
-		List<Ordinateur> GetImprimants();
+		Imprimante FindImprimante(int id);
+		List<Imprimante> GetImprimants();
 		void UpdateImprimante(int id, Imprimante newImprimante);
 
 	}

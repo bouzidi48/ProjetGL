@@ -2,7 +2,7 @@
 {
 	public class Materiel
 	{
-		private static int cp=0;
+		public static int cp=0;
 		private int materielId;
 		private string marque;
 		private TypeMateriel type;
