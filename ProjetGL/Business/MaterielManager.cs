@@ -37,7 +37,7 @@ namespace ProjetGL.Business
 			return data.ExistOrdinateur(id);
 		}
 
-		public Ordinateur FindImprimante(int id)
+		public Imprimante FindImprimante(int id)
 		{
 			return data.FindImprimante(id);
 		}
@@ -47,7 +47,7 @@ namespace ProjetGL.Business
 			return data.FindOrdinateur(id);
 		}
 
-		public List<Ordinateur> GetImprimants()
+		public List<Imprimante> GetImprimants()
 		{
 			return data.GetImprimants();
 		}
