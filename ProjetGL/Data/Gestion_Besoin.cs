@@ -69,11 +69,11 @@ namespace ProjetGL.Data
 					}
 				}
 				reader2.Close();
-				//Departement departement = ServicesPages.managerDepartement.FindDepartement((int)reader1["DepartementId"]);
-				//Enseignant enseignant = ServicesPages.managerEnseignant.FindEnseignant((int)reader1["EnseignantId"]);
-				//Besoin besoin = new Besoin()
-
-
+				Departement departement = ServicesPages.managerDepartement.FindDepartement((int)reader1["DepartementId"]);
+				Enseignant enseignant = ServicesPages.managerEnseignant.FindEnseignant((int)reader1["EnseignantId"]);
+				Besoin besoin = new Besoin((int)reader1["BesoinId"],materiels, departement, enseignant);
+				reader1.Close();
+				return besoin;
 
 			}
 			reader1.Close();
