@@ -11,6 +11,14 @@
 		public string Nom { get => nom; set => nom = value; }
 		public double Budget { get => budget; set => budget = value; }
 
+
+		public Departement(int id, string nom, double budget)
+		{
+
+			Id = id;
+			Nom = nom;
+			Budget = budget;
+		}
 		public Departement(string nom, double budget)
 		{
 			cp = cp + 1;
@@ -18,6 +26,8 @@
 			Nom = nom;
 			Budget = budget;
 		}
+
+		
 
 		public override string ToString()
 		{

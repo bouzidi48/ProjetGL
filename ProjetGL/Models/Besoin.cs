@@ -27,5 +27,14 @@ namespace ProjetGL.Models
 			Enseignant = enseignant;
 		}
 
+		public Besoin(int id, List<Materiel> materiels, Departement departement, Enseignant enseignant)
+		{
+			
+			Id = id;
+			Materiels = materiels;
+			Departement = departement;
+			Enseignant = enseignant;
+		}
+
 	}
 }
