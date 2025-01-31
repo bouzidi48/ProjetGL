@@ -11,6 +11,8 @@ namespace ProjetGL.GlobalServices
             public static IAccountManager managerAccount;
             public static IMessagerieManager managerMessagerie;
             public static IMaterielManager managerMateriel;
+            public static IDepartementManager managerDepartement;
+            public static IEnseignantManager managerEnseignant;
 		//public static IDataAccount data ;
 		static ServicesPages()
             {
@@ -18,6 +20,8 @@ namespace ProjetGL.GlobalServices
                 managerAccount = new AccountManager(); //on instancie le service
                 managerMessagerie = new MessagerieManager();
                 managerMateriel = new MaterielManager();
+                managerDepartement = new DepartementManager();
+			    managerEnseignant = new EnseignantManager();
 		}
     }
 }
