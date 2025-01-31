@@ -119,7 +119,30 @@ namespace ProjetGL.Data
             return null;
         }
 
-        public List<Imprimante> GetImprimants()
+        public Materiel FindMateriel(int id)
+		{
+			GlobalBD.Bd.Command.CommandText = $@"
+            SELECT * FROM Materiels WHERE MaterielId = {id}";
+			SqlDataReader reader = GlobalBD.Bd.Command.ExecuteReader();
+			if (reader.Read())
+			{
+				if (ExistImprimante(id))
+				{
+					reader.Close();
+					return FindImprimante(id);
+				}
+				else if (ExistOrdinateur(id))
+				{
+					reader.Close();
+					return FindOrdinateur(id);
+				}
+			}
+			reader.Close();
+			return null;
+		}
+
+
+		public List<Imprimante> GetImprimants()
 		{
             List<Imprimante> list = new List<Imprimante>();
             GlobalBD.Bd.Command.CommandText = $@"
@@ -201,7 +224,7 @@ namespace ProjetGL.Data
             {
                 int maxId = 0;
                 // Requête pour récupérer le maximum de IdUser
-                GlobalBD.Bd.Command.CommandText = $@"SELECT ISNULL(MAX(Id), 0) FROM account";
+                GlobalBD.Bd.Command.CommandText = $@"SELECT ISNULL(MAX(MaterielId), 0) FROM Materiels";
 
                 SqlDataReader rs = GlobalBD.Bd.Command.ExecuteReader();
                 if (rs.Read() == true)

@@ -42,6 +42,11 @@ namespace ProjetGL.Business
 			return data.FindImprimante(id);
 		}
 
+		public Materiel FindMateriel(int id)
+		{
+			return data.FindMateriel(id);
+		}
+
 		public Ordinateur FindOrdinateur(int id)
 		{
 			return data.FindOrdinateur(id);
@@ -66,5 +71,7 @@ namespace ProjetGL.Business
 		{
 			data.UpdateOrdinateur(id, newOrdinateur);
 		}
+
+
 	}
 }

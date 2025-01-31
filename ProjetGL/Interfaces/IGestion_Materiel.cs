@@ -18,5 +18,7 @@ namespace ProjetGL.Interfaces
 		List<Imprimante> GetImprimants();
 		void UpdateImprimante(int id, Imprimante newImprimante);
 
+		Materiel FindMateriel(int id);
+
 	}
 }
