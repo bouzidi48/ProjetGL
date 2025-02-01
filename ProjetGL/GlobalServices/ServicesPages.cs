@@ -1,27 +1,25 @@
 ﻿using ProjetGL.Business;
-using ProjetGL.Data;
 using ProjetGL.Interfaces;
-
 
 namespace ProjetGL.GlobalServices
 {
 
-    public static class ServicesPages
-    {
-            public static IAccountManager managerAccount;
-            public static IMessagerieManager managerMessagerie;
-            public static IMaterielManager managerMateriel;
-            public static IDepartementManager managerDepartement;
-            public static IEnseignantManager managerEnseignant;
-		//public static IDataAccount data ;
+	public static class ServicesPages
+	{
+		public static IAccountManager manager;
+		public static IFournisseurManager managerFournisseur;
+		public static IAppelOffreManager appelOffreManager;
+		public static IPropositionManager propositionManager;
+		public static IRessourceManager ressourceManager;
 		static ServicesPages()
-            {
-                //manager = new AccountManager(); //on instancie le service
-                managerAccount = new AccountManager(); //on instancie le service
-                managerMessagerie = new MessagerieManager();
-                managerMateriel = new MaterielManager();
-                managerDepartement = new DepartementManager();
-			    managerEnseignant = new EnseignantManager();
+		{
+			manager = new AccountManager(); // on instancie le service
+											//manager = new AccountManagerV2();
+			managerFournisseur = new FournisseurManager();
+			appelOffreManager = new AppelOffreManager();
+			propositionManager = new PropositionManager();
+			ressourceManager = new RessourceManager();
+
 		}
-    }
+	}
 }

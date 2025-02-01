@@ -2,13 +2,11 @@
 
 namespace ProjetGL.Interfaces
 {
-    public interface IAccountManager
-    {
-        void Add(Account account);
-        void Del(string login);
-        bool Exist(string login);
-        Account Find(string login);
-        List<Account> GetAccounts();
-        void Update(string login, Account newAccount);
+	public interface IAccountManager
+	{
+        void AddAccount(Account account);
+        Account FindAccount(string username);
+        void DeleteAccount(string username);
+        List<Account> GetAllAccounts();
     }
 }
