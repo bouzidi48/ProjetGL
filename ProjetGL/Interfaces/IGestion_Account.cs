@@ -1,16 +1,13 @@
 ﻿using ProjetGL.Models;
 
-
 namespace ProjetGL.Interfaces
 {
-    public interface IGestion_Account
-    {
-        void Add(Account account);
-        void Del(string Username);
-        bool Exist(string Username);
-        Account Find(string Username);
-        List<Account> GetAccounts();
-        void Update(string Username, Account newAccount);
-
+	public interface IGestion_Account
+	{
+        void AddAccount(Account account);
+        Account FindAccount(string username);
+        void UpdateAccount(string Username,Account account);
+        void DeleteAccount(string username);
+        List<Account> GetAllAccounts();
     }
 }
