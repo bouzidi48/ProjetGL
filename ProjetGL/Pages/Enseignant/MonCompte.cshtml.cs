@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ProjetGL.Pages.Roles
+namespace ProjetGL.Pages.Enseignant
 {
-    public class TechnicienModel : PageModel
+    public class MonCompteModel : PageModel
     {
         public void OnGet()
         {

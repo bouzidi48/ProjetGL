@@ -1,0 +1,32 @@
+﻿@page
+@model ProjetGL.Pages.Enseignant.MonCompteModel
+@{
+    ViewData["Title"] = "Mon Compte";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-primary">Gestion de mon compte</h2>
+        
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <div class="alert alert-info">@Model.Message</div>
+        }
+        
+        <form method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">Nom d'utilisateur :</label>
+                <input type="text" asp-for="UserAccount.Username" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Nouveau mot de passe :</label>
+                <input type="password" asp-for="UserAccount.Password" class="form-control" />
+            </div>
+
+            <button type="submit" class="btn btn-success">Mettre à jour</button>
+        </form>
+
+        <a href="/EnseignantDashboard" class="btn btn-secondary mt-3">Retour</a>
+    </div>
+</div>

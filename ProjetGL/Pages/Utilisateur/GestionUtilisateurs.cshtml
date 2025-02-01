@@ -1,0 +1,44 @@
+﻿@page
+@model ProjetGL.Pages.Utilisateur.GestionUtilisateursModel
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-primary text-center">Gestion des Utilisateurs</h2>
+
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <div class="alert alert-info">@Model.Message</div>
+        }
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Login</th>
+                        <th>Rôle</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr>
+                            <td>@user.Username</td>
+                            <td>@user.Role</td>
+                            <td class="text-center">
+                                <form method="post" asp-page-handler="Delete" class="d-inline">
+                                    <input type="hidden" name="username" value="@user.Username" />
+                                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-grid gap-2 mt-3">
+            <a asp-page="AjouterUtilisateur" class="btn btn-success">Ajouter un Utilisateur</a>
+        </div>
+    </div>
+</div>

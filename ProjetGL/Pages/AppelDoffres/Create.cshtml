@@ -1,0 +1,45 @@
+﻿@page
+@model ProjetGL.Pages.AppelDoffres.CreateModel
+@{
+    ViewData["Title"] = "Créer un Appel d'Offre";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-primary">Créer un Appel d'Offre</h2>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+        }
+
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Date Début :</label>
+                <input type="date" asp-for="AppelOffre.DateDebut" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Date Fin :</label>
+                <input type="date" asp-for="AppelOffre.DateFin" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description :</label>
+                <textarea asp-for="AppelOffre.Description" class="form-control" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Ressources :</label>
+                <select multiple asp-for="SelectedRessources" class="form-control">
+                    @foreach (var ressource in Model.RessourcesDisponibles)
+                    {
+                        <option value="@ressource.RessourceId">@ressource.Type - @ressource.Marque</option>
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-success">Ajouter</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+﻿@page "{id:int}"
+@model ProjetGL.Pages.AppelDoffres.DeleteModel
+@{
+    ViewData["Title"] = "Supprimer un Appel d'Offre";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-danger">Supprimer un Appel d'Offre</h2>
+        <p class="lead">Voulez-vous vraiment supprimer cet appel d'offre ?</p>
+        <ul class="list-group mb-3">
+            <li class="list-group-item"><strong>ID:</strong> @Model.AppelOffre.AppelId</li>
+            <li class="list-group-item"><strong>Date Début:</strong> @Model.AppelOffre.DateDebut.ToShortDateString()</li>
+            <li class="list-group-item"><strong>Date Fin:</strong> @Model.AppelOffre.DateFin.ToShortDateString()</li>
+            <li class="list-group-item"><strong>Description:</strong> @Model.AppelOffre.Description</li>
+        </ul>
+        <form method="post">
+            <input type="hidden" asp-for="AppelOffre.AppelId" />
+            <button type="submit" class="btn btn-danger me-2">Confirmer la suppression</button>
+            <a asp-page="Lister" class="btn btn-secondary">Annuler</a>
+        </form>
+    </div>
+</div>
