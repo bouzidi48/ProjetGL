@@ -1,44 +1,40 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-
 namespace ProjetGL.Models
 {
-
     public class Account
     {
-        private int id;
-        public static int cp=0;
-            
         private string username;
         private string password;
-        [Required]
-        private Role userRole;
+        private string role;
 
-        public int Id { get => id; set => id = value; }
-        public string Username { get => username; set => username = value; }
-        public string Password { get => password; set => password = value; }
-        public Role UserRole { get => userRole; set => userRole = value; }
-
-
-        public Account(string username, string password, Role userRole)
+        public Account()
         {
-            cp = cp + 1;
-            Id = cp;
-            Username = username;
-            Password = password;
-            UserRole = userRole;
-        }
-            
-        public Account() {
-            cp = cp + 1;
-            Id = cp;
+            username = "user";
+            password = "";
+            role = "Utilisateur"; // Rôle par défaut
         }
 
 
-        public override string ToString()
+        public string Username
         {
-            return "Id: " + Id + " Username: " + Username + " Password: " + Password + " Role: " + UserRole;
+            get => username;
+            set => username = value;
         }
 
+        // [DataType(DataType.Password)]
+        public string? Password
+        {
+            get => password;
+            set => password = value;
+        }
+
+        // Champ pour le rôle de l'utilisateur
+
+        public string Role
+        {
+            get => role;
+            set => role = value;
+        }
     }
 }

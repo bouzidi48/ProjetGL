@@ -1,29 +1,24 @@
-﻿namespace ProjetGL.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace ProjetGL.Models
 {
-	public class AppelOffre
-	{
-		private static int cp = 0;
-		private int id;
-		private List<Besoin> besoins;
-		private Responsable responsable;
-		private DateTime dateDebut;
-		private DateTime dateFin;
+    public class AppelOffre
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int AppelId { get; set; }
 
+        [Required]
+        public DateTime DateDebut { get; set; }
 
-		public int Id { get => id; set => id = value; }
-		public List<Besoin> Besoins { get => besoins; set => besoins = value; }
-		public Responsable Responsable { get => responsable; set => responsable = value; }
-		public DateTime DateDebut { get => dateDebut; set => dateDebut = value; }
-		public DateTime DateFin { get => dateFin; set => dateFin = value; }
+        [Required]
+        public DateTime DateFin { get; set; }
 
-		public AppelOffre(List<Besoin> besoins, Responsable responsable,DateTime dateDebut, DateTime dateFin)
-		{
-			cp = cp + 1;
-			Id = cp;
-			Besoins = besoins;
-			Responsable = responsable;
-			DateDebut = dateDebut;
-			DateFin = dateFin;
-		}
-	}
+        [Required]
+        public string Description { get; set; }
+
+        // Relation Many-to-Many avec Ressources
+        public List<Ressource> Ressources { get; set; } = new List<Ressource>();
+    }
 }
