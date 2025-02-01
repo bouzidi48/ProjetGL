@@ -1,37 +1,20 @@
-﻿namespace ProjetGL.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProjetGL.Models
 {
-	public class Departement
-	{
-		private static int cp = 0;
-		private int id;
-		private string nom;
-		private double budget;
+    public class Departement
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
 
-		public int Id { get => id; set => id = value; }
-		public string Nom { get => nom; set => nom = value; }
-		public double Budget { get => budget; set => budget = value; }
+        public Departement()
+        {
+            this.Name = " ";
+        }
+
+        //public List<DemandeRessource> DemandesRessources { get; set; } = new List<DemandeRessource>();
 
 
-		public Departement(int id, string nom, double budget)
-		{
 
-			Id = id;
-			Nom = nom;
-			Budget = budget;
-		}
-		public Departement(string nom, double budget)
-		{
-			cp = cp + 1;
-			Id = cp;
-			Nom = nom;
-			Budget = budget;
-		}
-
-		
-
-		public override string ToString()
-		{
-			return "Departement : [id :" + Id + " Nom : " + Nom + " Budget : " + Budget + "]";
-		}
-	}
+    }
 }
