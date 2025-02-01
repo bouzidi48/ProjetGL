@@ -1,42 +1,37 @@
-﻿
-using ProjetGL.Data;
-using ProjetGL.Interfaces;
+﻿using ProjetGL.Data;
 using ProjetGL.Models;
+using ProjetGL.Interfaces;
 
 namespace ProjetGL.Business
 {
-
     public class AccountManager : IAccountManager
-    {
-        IGestion_Account data = new Gestion_Account();
-        public void Add(Account account)
+	{
+		IGestion_Account data = new Gestion_Account();
+
+        public void AddAccount(Account account)
         {
-            data.Add(account);
+            if (data.FindAccount(account.Username) == null)
+                data.AddAccount(account);
+            else
+                throw new Exception("account already exist");
         }
 
-        public void Del(string login)
+        public void DeleteAccount(string username)
         {
-            data.Del(login);
+            data.DeleteAccount(username);
         }
 
-        public bool Exist(string login)
+        public Account FindAccount(string username)
         {
-            return data.Exist(login);
+            return data.FindAccount(username);
         }
 
-        public Account Find(string login)
+        public List<Account> GetAllAccounts()
         {
-            return data.Find(login);
+            return data.GetAllAccounts();
         }
 
-        public List<Account> GetAccounts()
-        {
-            return data.GetAccounts();
-        }
-
-        public void Update(string login, Account newAccount)
-        {
-            data.Update(login, newAccount);
-        }
+        
     }
+
 }
