@@ -1,0 +1,39 @@
+﻿@page
+@model ProjetGL.Pages.AppelDoffres.ListerModel
+@{
+    ViewData["Title"] = "Liste des Appels d'Offres";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-primary">Liste des Appels d'Offres</h2>
+        <a asp-page="Create" class="btn btn-success mb-3">Ajouter un Appel d'Offre</a>
+
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Date Début</th>
+                    <th>Date Fin</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var appel in Model.AppelsDoffres)
+                {
+                    <tr>
+                        <td>@appel.AppelId</td>
+                        <td>@appel.DateDebut.ToShortDateString()</td>
+                        <td>@appel.DateFin.ToShortDateString()</td>
+                        <td>@appel.Description</td>
+                        <td>
+                            <a asp-page="Details" asp-route-id="@appel.AppelId" class="btn btn-info me-2">Détails</a>
+                            <a asp-page="Delete" asp-route-id="@appel.AppelId" class="btn btn-danger">Supprimer</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

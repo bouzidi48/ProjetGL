@@ -1,0 +1,62 @@
+﻿@page "{id:int}"
+@model ProjetGL.Pages.AppelDoffres.DetailsModel
+@{
+    ViewData["Title"] = "Détails de l'Appel d'Offre";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-info">Détails de l'Appel d'Offre</h2>
+
+        @if (Model.AppelOffre != null)
+        {
+            <div class="card p-3 mb-3">
+                <h4><strong>ID :</strong> @Model.AppelOffre.AppelId</h4>
+                <p><strong>Date Début :</strong> @Model.AppelOffre.DateDebut.ToShortDateString()</p>
+                <p><strong>Date Fin :</strong> @Model.AppelOffre.DateFin.ToShortDateString()</p>
+                <p><strong>Description :</strong> @Model.AppelOffre.Description</p>
+            </div>
+
+            <h3 class="mt-4">Ressources Associées</h3>
+            @if (Model.AppelOffre.Ressources.Any())
+            {
+                <div class="row">
+                    @foreach (var ressource in Model.AppelOffre.Ressources)
+                    {
+                        <div class="col-md-4">
+                            <div class="card p-3 mb-3">
+                                <h4>@ressource.Type - @ressource.Marque</h4>
+                                <ul>
+                                    @if (ressource.Type == "Ordinateur")
+                                    {
+                                        <li><strong>RAM :</strong> @(ressource.RAM?.ToString() ?? "N/A") GB</li>
+                                        <li><strong>CPU :</strong> @ressource.CPU</li>
+                                        <li><strong>Disque Dur :</strong> @ressource.DisqueDur</li>
+                                        <li><strong>Écran :</strong> @ressource.Ecran</li>
+                                    }
+                                    @if (ressource.Type == "Imprimante")
+                                    {
+                                        <li><strong>Vitesse Impression :</strong> @ressource.VitesseImpression</li>
+                                        <li><strong>Résolution :</strong> @ressource.Resolution</li>
+                                    }
+                                    <li><strong>Prix :</strong> @(ressource.Prix.HasValue ? ressource.Prix.Value.ToString("C") : "Non renseigné")</li>
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>Aucune ressource associée</p>
+            }
+            <a asp-page="Lister" class="btn btn-secondary mt-3">Retour</a>
+        }
+        else
+        {
+            <div class="alert alert-danger">
+                <p>Impossible de trouver cet Appel d'Offre.</p>
+            </div>
+        }
+    </div>
+</div>
