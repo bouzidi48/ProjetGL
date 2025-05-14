@@ -23,8 +23,8 @@ namespace ProjetNet.data
 		public void Add(Projet entity)
 		{
 			command.Parameters.Clear();
-			command.CommandText = @"INSERT INTO Projet (nom, description, dateDemarrage, dateLivraison, nombreJoursDev, clientId, directeurId, chefProjetId, methodologie, dateReunion) 
-                           VALUES (@nom, @description, @dateDemarrage, @dateLivraison, @nombreJoursDev, @clientId, @directeurId, @chefProjetId, @methodologie, @dateReunion)";
+			command.CommandText = @"INSERT INTO Projet (nom, description, dateDemarrage, dateLivraison, nombreJoursDev, clientId, directeurId, chefProjetId, methodologie, dateReunion, technologies) 
+                           VALUES (@nom, @description, @dateDemarrage, @dateLivraison, @nombreJoursDev, @clientId, @directeurId, @chefProjetId, @methodologie, @dateReunion, @technologies)";
 
 			command.Parameters.AddWithValue("@nom", entity.Nom ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@description", entity.Description ?? (object)DBNull.Value);
@@ -37,12 +37,23 @@ namespace ProjetNet.data
 			command.Parameters.AddWithValue("@methodologie", entity?.Methodologie ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@dateReunion", entity.DateReunion ?? (object)DBNull.Value);
 
+			// Conversion de la liste de technologies en string séparé par des virgules
+			string technologiesStr = entity.Technologies != null
+				? string.Join(",", entity.Technologies.Select(t => t.ToString()))
+				: null;
+			command.Parameters.AddWithValue("@technologies", (object?)technologiesStr ?? DBNull.Value);
+
+
 			command.ExecuteNonQuery();
 		}
 
 
 		public void Delete(int id)
 		{
+			command.Parameters.Clear();
+			command.CommandText = @"Update Developpeur SET projetId = null";
+			command.Parameters.AddWithValue("@id", id);
+			command.ExecuteNonQuery();
 			command.Parameters.Clear();
 			command.CommandText = @"DELETE FROM Projet WHERE id = @id";
 			command.Parameters.AddWithValue("@id", id);
@@ -51,6 +62,11 @@ namespace ProjetNet.data
 
 		public void Delete(string id)
 		{
+            Projet projet = GetById(id);
+			command.Parameters.Clear();
+			command.CommandText = @"Update Developpeur SET projetId = null";
+			command.Parameters.AddWithValue("@id", projet.Id);
+			command.ExecuteNonQuery();
 			command.Parameters.Clear();
 			command.CommandText = @"DELETE FROM Projet WHERE nom = @nom";
 			command.Parameters.AddWithValue("@nom", id);
@@ -63,9 +79,22 @@ namespace ProjetNet.data
             command.CommandText = @"SELECT * FROM Projet";
             rd = command.ExecuteReader();
             List<Projet> projets = new List<Projet>();
+            List<Technologie> technologies = new List<Technologie>();
             while (rd.Read())
             {
-                Methodologie methodologieEnum = Methodologie.Acune; // Valeur par défaut
+				if (!rd.IsDBNull(rd.GetOrdinal("technologies")))
+				{
+					string techString = rd.GetString(rd.GetOrdinal("technologies"));
+					var techSplit = techString.Split(',', StringSplitOptions.RemoveEmptyEntries);
+					foreach (var tech in techSplit)
+					{
+						if (Enum.TryParse<Technologie>(tech.Trim(), true, out var parsedTech))
+						{
+							technologies.Add(parsedTech);
+						}
+					}
+				}
+				Methodologie methodologieEnum = Methodologie.Acune; // Valeur par défaut
 
                 if (!rd.IsDBNull(rd.GetOrdinal("methodologie")))
                 {
@@ -91,9 +120,11 @@ namespace ProjetNet.data
                     ChefProjet = rd.IsDBNull(rd.GetOrdinal("chefProjetId")) ? null : new ChefProjet { Id = rd.GetInt32(rd.GetOrdinal("chefProjetId")) },
                     // Utiliser la valeur enum convertie
                     Methodologie = methodologieEnum,
-                    DateReunion = rd.IsDBNull(rd.GetOrdinal("dateReunion")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateReunion"))
+                    DateReunion = rd.IsDBNull(rd.GetOrdinal("dateReunion")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateReunion")),
+                    Technologies = technologies
                 };
                 projets.Add(projet);
+                technologies.Clear();
             }
             rd.Close();
             foreach (Projet item in projets)
@@ -120,9 +151,22 @@ namespace ProjetNet.data
 
             rd = command.ExecuteReader();
             Projet projet = null;
-            if (rd.Read())
+			List<Technologie> technologies = new List<Technologie>();
+			if (rd.Read())
             {
-                Methodologie methodologieEnum = Methodologie.Acune; // Valeur par défaut
+				if (!rd.IsDBNull(rd.GetOrdinal("technologies")))
+				{
+					string techString = rd.GetString(rd.GetOrdinal("technologies"));
+					var techSplit = techString.Split(',', StringSplitOptions.RemoveEmptyEntries);
+					foreach (var tech in techSplit)
+					{
+						if (Enum.TryParse<Technologie>(tech.Trim(), true, out var parsedTech))
+						{
+							technologies.Add(parsedTech);
+						}
+					}
+				}
+				Methodologie methodologieEnum = Methodologie.Acune; // Valeur par défaut
 
                 if (!rd.IsDBNull(rd.GetOrdinal("methodologie")))
                 {
@@ -148,7 +192,8 @@ namespace ProjetNet.data
                     ChefProjet = rd.IsDBNull(rd.GetOrdinal("chefProjetId")) ? null : new ChefProjet { Id = rd.GetInt32(rd.GetOrdinal("chefProjetId")) },
                     // Utiliser la valeur enum convertie
                     Methodologie = methodologieEnum,
-                    DateReunion = rd.IsDBNull(rd.GetOrdinal("dateReunion")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateReunion"))
+                    DateReunion = rd.IsDBNull(rd.GetOrdinal("dateReunion")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateReunion")),
+                    Technologies = technologies
                 };
                
             }
@@ -171,9 +216,22 @@ namespace ProjetNet.data
             command.Parameters.AddWithValue("@id", id);
             rd = command.ExecuteReader();
             Projet projet = null;
-            if (rd.Read())
-            {
-                Methodologie methodologieEnum = Methodologie.Acune; // Valeur par défaut
+			List<Technologie> technologies = new List<Technologie>();
+			if (rd.Read())
+			{
+				if (!rd.IsDBNull(rd.GetOrdinal("technologies")))
+				{
+					string techString = rd.GetString(rd.GetOrdinal("technologies"));
+					var techSplit = techString.Split(',', StringSplitOptions.RemoveEmptyEntries);
+					foreach (var tech in techSplit)
+					{
+						if (Enum.TryParse<Technologie>(tech.Trim(), true, out var parsedTech))
+						{
+							technologies.Add(parsedTech);
+						}
+					}
+				}
+				Methodologie methodologieEnum = Methodologie.Acune; // Valeur par défaut
 
                 if (!rd.IsDBNull(rd.GetOrdinal("methodologie")))
                 {
@@ -199,7 +257,8 @@ namespace ProjetNet.data
                     ChefProjet = rd.IsDBNull(rd.GetOrdinal("chefProjetId")) ? null : new ChefProjet { Id = rd.GetInt32(rd.GetOrdinal("chefProjetId")) },
                     // Utiliser la valeur enum convertie
                     Methodologie = methodologieEnum,
-                    DateReunion = rd.IsDBNull(rd.GetOrdinal("dateReunion")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateReunion"))
+                    DateReunion = rd.IsDBNull(rd.GetOrdinal("dateReunion")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateReunion")),
+                    Technologies = technologies
                 };
 
             }
@@ -230,7 +289,8 @@ namespace ProjetNet.data
             directeurId = @directeurId,
             chefProjetId = @chefProjetId,
             methodologie = @methodologie,
-            dateReunion = @dateReunion
+            dateReunion = @dateReunion,
+            technologies = @technologies
         WHERE id = @id";
 
 			command.Parameters.AddWithValue("@id", entity.Id);
@@ -245,25 +305,16 @@ namespace ProjetNet.data
 			command.Parameters.AddWithValue("@methodologie", entity?.Methodologie ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@dateReunion", entity.DateReunion ?? (object)DBNull.Value);
 
+			// Convertir la liste des technologies en chaîne séparée par virgule
+			string techString = entity.Technologies != null && entity.Technologies.Any()
+				? string.Join(",", entity.Technologies.Select(t => t.ToString()))
+				: null;
+
+			command.Parameters.AddWithValue("@technologies", (object?)techString ?? DBNull.Value);
+
 			command.ExecuteNonQuery();
 		}
 
-        public void ajouterTechnoPorjet(Projet projet)
-        {
-            if (projet != null && projet.Technologies.Count>=0)
-            {
-                foreach(Technologie techno in projet.Technologies)
-                {
-                    command.Parameters.Clear();
-                    command.CommandText = @"INSERT INTO ProjetTechnologie (projetId, technologieId) 
-                           VALUES (@projetId, @technologieId)";
-                    command.Parameters.AddWithValue("@projetId", projet.Id);
-                    command.Parameters.AddWithValue("@technologieId", techno.Id);
-                    command.ExecuteNonQuery();
-                }
-            }
-
-
-        }
+        
 	}
 }
