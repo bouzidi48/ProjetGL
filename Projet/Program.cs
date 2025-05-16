@@ -1,3 +1,6 @@
+using ProjetNet.Bussiness;
+using ProjetNet.Services;
+
 namespace ProjetNet
 {
     public class Program
@@ -9,6 +12,7 @@ namespace ProjetNet
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddScoped<InterfaceUtilisateurManager, UtilisateurManager>();
 
             var app = builder.Build();
 
