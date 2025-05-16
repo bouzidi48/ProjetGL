@@ -10,6 +10,7 @@ namespace ProjetNet.data
         SqlCommand command;
         SqlDataReader rd;
         UtilisateurDAO utilisateurDAO;
+        ProjetDAO projetDAO;
         public DeveloppeurDAO()
         {
             connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=""C:\Users\oo\Documents\esisa_4eme_annee\Porjet .NET\projet .NET\ProjetGL\Projet\data\db_GL\db_GL.mdf"";Integrated Security=True");
@@ -17,6 +18,7 @@ namespace ProjetNet.data
             command = new SqlCommand();
             command.Connection = connection;
             utilisateurDAO = new UtilisateurDAO();
+            projetDAO = new ProjetDAO();
         }
 
         public void Add(Developpeur entity)
@@ -55,74 +57,77 @@ namespace ProjetNet.data
             command.Parameters.Clear();
             command.CommandText = @"
                     UPDATE Developpeur
-                    SET projetId = @projetId
+                    SET projetId = @projetId,
+                        technologies = @technologies
                     WHERE id = @id";
 
             command.Parameters.AddWithValue("@id", entity.Id);
             command.Parameters.AddWithValue("@projetId", entity.Projet?.Id ?? (object)DBNull.Value);
 
+            // Convertir la liste des technologies en chaîne séparée par virgule
+            string techString = entity.Technologies != null && entity.Technologies.Any()
+                ? string.Join(",", entity.Technologies.Select(t => t.ToString()))
+                : null;
+
+            command.Parameters.AddWithValue("@technologies", (object?)techString ?? DBNull.Value);
+
             command.ExecuteNonQuery();
 
-            // 3. Mise à jour des technologies (optionnel mais recommandé)
-            // Suppression des anciennes associations
-            command.Parameters.Clear();
-            command.CommandText = @"DELETE FROM DeveloppeurTechnologie WHERE developpeurId = @id";
-            command.Parameters.AddWithValue("@id", entity.Id);
-            command.ExecuteNonQuery();
 
-            // Insertion des nouvelles
-            if (entity.Technologies != null)
-            {
-                foreach (var techno in entity.Technologies)
-                {
-                    command.Parameters.Clear();
-                    command.CommandText = @"INSERT INTO DeveloppeurTechnologie (developpeurId, technologieId) VALUES (@devId, @techId)";
-                    command.Parameters.AddWithValue("@devId", entity.Id);
-                    command.Parameters.AddWithValue("@techId", techno.Id);
-                    command.ExecuteNonQuery();
-                }
-            }
         }
 
-        public List<Developpeur> GetByTechno(Technologie technologie)
-        {
-            command.Parameters.Clear();
-            command.CommandText = @"SELECT * FROM DeveloppeurTechnologie WHERE technologieId = @id";
-            command.Parameters.AddWithValue("@id", technologie.Id);
-            rd = command.ExecuteReader();
 
+
+        public List<Developpeur> GetByTechnos(List<Technologie> technologies)
+        {
             List<Developpeur> developpeurs = new List<Developpeur>();
+
+            if (technologies == null || technologies.Count == 0)
+                return developpeurs;
+
+            // Construire la condition SQL dynamiquement
+            List<string> conditions = new List<string>();
+            for (int i = 0; i < technologies.Count; i++)
+            {
+                string paramName = $"@tech{i}";
+                conditions.Add($"technonlogies LIKE '%' + {paramName} + '%'");
+            }
+
+			string whereClause = $"({string.Join(" OR ", conditions)}) AND projetId IS NULL";
+			command.Parameters.Clear();
+            command.CommandText = $"SELECT * FROM Developpeur WHERE {whereClause}";
+
+            for (int i = 0; i < technologies.Count; i++)
+            {
+                command.Parameters.AddWithValue($"@tech{i}", technologies[i].ToString());
+            }
+
+            rd = command.ExecuteReader();
             while (rd.Read())
             {
-                Developpeur developpeur = new Developpeur
+                Developpeur dev = new Developpeur
                 {
-                    Id = rd.GetInt32(0),
+                    Id = rd.GetInt32(rd.GetOrdinal("id")),
+                    Projet = rd.IsDBNull(rd.GetOrdinal("projetId")) ? null : new Projet { Id = rd.GetInt32(rd.GetOrdinal("projetId")) },
+                    Technologies = rd.IsDBNull(rd.GetOrdinal("technonlogies"))
+                        ? new List<Technologie>()
+                        : rd.GetString(rd.GetOrdinal("technonlogies"))
+                              .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                              .Select(t => Enum.TryParse(t.Trim(), true, out Technologie result) ? result : (Technologie?)null)
+                              .Where(t => t.HasValue)
+                              .Select(t => t.Value)
+                              .ToList()
                 };
-                developpeurs.Add(developpeur);
+
+                developpeurs.Add(dev);
             }
+
             rd.Close();
-            List<Developpeur> developpeurs1 = new List<Developpeur>();
-
-            foreach (Developpeur developpeur in developpeurs)
+            foreach(Developpeur developpeur in developpeurs)
             {
-                Developpeur dev;
-
-                dev = (Developpeur)utilisateurDAO.GetById(developpeur.Id);
-                developpeurs1.Add(dev);
-            }
-            
-
-            return developpeurs1;
-        }
-
-        public List<Developpeur> GetByTechnos(List<Technologie> technologie)
-        {
-            List<Developpeur> developpeurs = new List<Developpeur>();
-            foreach (Technologie techno in technologie)
-            {
-               List<Developpeur> dev = GetByTechno(techno);
-                developpeurs.AddRange(dev);
+                developpeur.Projet = projetDAO.GetById(developpeur.Projet.Id);
             }
             return developpeurs;
         }
+    }
 }

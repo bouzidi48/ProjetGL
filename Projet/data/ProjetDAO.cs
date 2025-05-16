@@ -23,15 +23,15 @@ namespace ProjetNet.data
 		public void Add(Projet entity)
 		{
 			command.Parameters.Clear();
-			command.CommandText = @"INSERT INTO Projet (nom, description, dateDemarrage, dateLivraison, nombreJoursDev, clientId, directeurId, chefProjetId, methodologie, dateReunion, technologies) 
-                           VALUES (@nom, @description, @dateDemarrage, @dateLivraison, @nombreJoursDev, @clientId, @directeurId, @chefProjetId, @methodologie, @dateReunion, @technologies)";
+			command.CommandText = @"INSERT INTO Projet (nom, description, dateDemarrage, dateLivraison, nombreJoursDev, client, directeurId, chefProjetId, methodologie, dateReunion, technologies) 
+                           VALUES (@nom, @description, @dateDemarrage, @dateLivraison, @nombreJoursDev, @client, @directeurId, @chefProjetId, @methodologie, @dateReunion, @technologies)";
 
 			command.Parameters.AddWithValue("@nom", entity.Nom ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@description", entity.Description ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@dateDemarrage", entity.DateDemarrage ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@dateLivraison", entity.DateLivraison ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@nombreJoursDev", entity.NombreJoursDev.HasValue ? entity.NombreJoursDev.Value : (object)DBNull.Value);
-			command.Parameters.AddWithValue("@clientId", entity.Client?.Id ?? (object)DBNull.Value);
+			command.Parameters.AddWithValue("@client", entity.Client ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@directeurId", entity.Directeur?.Id ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@chefProjetId", entity.ChefProjet?.Id ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@methodologie", entity?.Methodologie ?? (object)DBNull.Value);
@@ -115,7 +115,7 @@ namespace ProjetNet.data
                     DateDemarrage = rd.IsDBNull(rd.GetOrdinal("dateDemarrage")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateDemarrage")),
                     DateLivraison = rd.IsDBNull(rd.GetOrdinal("dateLivraison")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateLivraison")),
                     NombreJoursDev = rd.IsDBNull(rd.GetOrdinal("nombreJoursDev")) ? (int?)null : rd.GetInt32(rd.GetOrdinal("nombreJoursDev")),
-                    Client = rd.IsDBNull(rd.GetOrdinal("clientId")) ? null : new Client { Id = rd.GetInt32(rd.GetOrdinal("clientId")) },
+                    Client = rd.IsDBNull(rd.GetOrdinal("client")) ? null : rd.GetString(rd.GetOrdinal("client")),
                     Directeur = rd.IsDBNull(rd.GetOrdinal("directeurId")) ? null : new DirecteurInformatique { Id = rd.GetInt32(rd.GetOrdinal("directeurId")) },
                     ChefProjet = rd.IsDBNull(rd.GetOrdinal("chefProjetId")) ? null : new ChefProjet { Id = rd.GetInt32(rd.GetOrdinal("chefProjetId")) },
                     // Utiliser la valeur enum convertie
@@ -187,7 +187,7 @@ namespace ProjetNet.data
                     DateDemarrage = rd.IsDBNull(rd.GetOrdinal("dateDemarrage")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateDemarrage")),
                     DateLivraison = rd.IsDBNull(rd.GetOrdinal("dateLivraison")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateLivraison")),
                     NombreJoursDev = rd.IsDBNull(rd.GetOrdinal("nombreJoursDev")) ? (int?)null : rd.GetInt32(rd.GetOrdinal("nombreJoursDev")),
-                    Client = rd.IsDBNull(rd.GetOrdinal("clientId")) ? null : new Client { Id = rd.GetInt32(rd.GetOrdinal("clientId")) },
+                    Client = rd.IsDBNull(rd.GetOrdinal("client")) ? null : rd.GetString(rd.GetOrdinal("client")),
                     Directeur = rd.IsDBNull(rd.GetOrdinal("directeurId")) ? null : new DirecteurInformatique { Id = rd.GetInt32(rd.GetOrdinal("directeurId")) },
                     ChefProjet = rd.IsDBNull(rd.GetOrdinal("chefProjetId")) ? null : new ChefProjet { Id = rd.GetInt32(rd.GetOrdinal("chefProjetId")) },
                     // Utiliser la valeur enum convertie
@@ -252,7 +252,7 @@ namespace ProjetNet.data
                     DateDemarrage = rd.IsDBNull(rd.GetOrdinal("dateDemarrage")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateDemarrage")),
                     DateLivraison = rd.IsDBNull(rd.GetOrdinal("dateLivraison")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateLivraison")),
                     NombreJoursDev = rd.IsDBNull(rd.GetOrdinal("nombreJoursDev")) ? (int?)null : rd.GetInt32(rd.GetOrdinal("nombreJoursDev")),
-                    Client = rd.IsDBNull(rd.GetOrdinal("clientId")) ? null : new Client { Id = rd.GetInt32(rd.GetOrdinal("clientId")) },
+                    Client = rd.IsDBNull(rd.GetOrdinal("clientId")) ? null : rd.GetString(rd.GetOrdinal("client")),
                     Directeur = rd.IsDBNull(rd.GetOrdinal("directeurId")) ? null : new DirecteurInformatique { Id = rd.GetInt32(rd.GetOrdinal("directeurId")) },
                     ChefProjet = rd.IsDBNull(rd.GetOrdinal("chefProjetId")) ? null : new ChefProjet { Id = rd.GetInt32(rd.GetOrdinal("chefProjetId")) },
                     // Utiliser la valeur enum convertie
@@ -299,7 +299,7 @@ namespace ProjetNet.data
 			command.Parameters.AddWithValue("@dateDemarrage", entity.DateDemarrage ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@dateLivraison", entity.DateLivraison ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@nombreJoursDev", entity.NombreJoursDev.HasValue ? entity.NombreJoursDev.Value : (object)DBNull.Value);
-			command.Parameters.AddWithValue("@clientId", entity.Client?.Id ?? (object)DBNull.Value);
+			command.Parameters.AddWithValue("@clientId", entity.Client ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@directeurId", entity.Directeur?.Id ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@chefProjetId", entity.ChefProjet?.Id ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@methodologie", entity?.Methodologie ?? (object)DBNull.Value);

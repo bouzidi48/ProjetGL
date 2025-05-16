@@ -12,7 +12,7 @@
 
 		public DirecteurInformatique Directeur {  get; set; }
 
-		public Client Client { get; set; }
+		public string Client { get; set; }
 		public ChefProjet ChefProjet { get; set; }
 		public Methodologie Methodologie { get; set; }
 		public List<ServiceProjet> Services { get; set; }

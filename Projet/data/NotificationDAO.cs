@@ -73,15 +73,53 @@ namespace ProjetNet.data
             return notification;
         }
 
+		public Notification GetById(string id)
+		{
+			throw new NotImplementedException();
+		}
 
-        public Notification GetById(string id)
+		public Notification GetByIdAndNotLue(int id)
         {
-            throw new NotImplementedException();
-        }
+			command.Parameters.Clear();
+			command.CommandText = @"SELECT * FROM Notification WHERE IdDestinataire = @id AND estLue = 0";
+			command.Parameters.AddWithValue("@id", id);
 
-        public void Update(Notification entity)
-        {
-            throw new NotImplementedException();
-        }
-    }
+			rd = command.ExecuteReader();
+			Notification notification = null;
+
+			if (rd.Read())
+			{
+				notification = new Notification
+				{
+					Id = rd.GetInt32(rd.GetOrdinal("id")),
+					Message = rd.IsDBNull(rd.GetOrdinal("message")) ? null : rd.GetString(rd.GetOrdinal("message")),
+					EstLue = rd.IsDBNull(rd.GetOrdinal("estLue")) ? false : rd.GetBoolean(rd.GetOrdinal("estLue")),
+					Destinataire = rd.IsDBNull(rd.GetOrdinal("IdDestinataire")) ? null :
+						(Utilisateur)utilisateurDAO.GetById(rd.GetInt32(rd.GetOrdinal("IdDestinataire")))
+				};
+			}
+
+			rd.Close();
+			return notification;
+		}
+
+		public void Update(Notification entity)
+		{
+			command.Parameters.Clear();
+			command.CommandText = @"
+        UPDATE Notification 
+        SET 
+            message = @message,
+            estLue = @estLue,
+            IdDestinataire = @destinataireId
+        WHERE id = @id";
+
+			command.Parameters.AddWithValue("@id", entity.Id);
+			command.Parameters.AddWithValue("@message", entity.Message ?? (object)DBNull.Value);
+			command.Parameters.AddWithValue("@estLue", entity.EstLue);
+			command.Parameters.AddWithValue("@destinataireId", entity.Destinataire?.Id ?? (object)DBNull.Value);
+
+			command.ExecuteNonQuery();
+		}
+	}
 }
