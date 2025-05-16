@@ -285,7 +285,7 @@ namespace ProjetNet.data
             dateDemarrage = @dateDemarrage,
             dateLivraison = @dateLivraison,
             nombreJoursDev = @nombreJoursDev,
-            clientId = @clientId,
+            client = @client,
             directeurId = @directeurId,
             chefProjetId = @chefProjetId,
             methodologie = @methodologie,
@@ -299,7 +299,7 @@ namespace ProjetNet.data
 			command.Parameters.AddWithValue("@dateDemarrage", entity.DateDemarrage ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@dateLivraison", entity.DateLivraison ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@nombreJoursDev", entity.NombreJoursDev.HasValue ? entity.NombreJoursDev.Value : (object)DBNull.Value);
-			command.Parameters.AddWithValue("@clientId", entity.Client ?? (object)DBNull.Value);
+			command.Parameters.AddWithValue("@client", entity.Client ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@directeurId", entity.Directeur?.Id ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@chefProjetId", entity.ChefProjet?.Id ?? (object)DBNull.Value);
 			command.Parameters.AddWithValue("@methodologie", entity?.Methodologie ?? (object)DBNull.Value);
