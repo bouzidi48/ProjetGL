@@ -8,5 +8,7 @@
 
 		public Developpeur Developpeur { get; set; }
 		public ServiceProjet Service { get; set; }
-	}
+
+		public string Nom { get; set; }
+    }
 }
