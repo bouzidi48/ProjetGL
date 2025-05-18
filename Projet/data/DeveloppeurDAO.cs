@@ -11,6 +11,8 @@ namespace ProjetNet.data
         SqlDataReader rd;
         UtilisateurDAO utilisateurDAO;
         ProjetDAO projetDAO;
+        ServiceDAO serviceDAO;
+        TacheDAO tacheDAO;
         public DeveloppeurDAO()
         {
             connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=""C:\Users\oo\Documents\esisa_4eme_annee\Porjet .NET\projet .NET\ProjetGL\Projet\data\db_GL\db_GL.mdf"";Integrated Security=True");
@@ -19,6 +21,8 @@ namespace ProjetNet.data
             command.Connection = connection;
             utilisateurDAO = new UtilisateurDAO();
             projetDAO = new ProjetDAO();
+            serviceDAO = new ServiceDAO();
+            tacheDAO = new TacheDAO();
         }
 
         public void Add(Developpeur entity)
@@ -51,7 +55,63 @@ namespace ProjetNet.data
             throw new NotImplementedException();
         }
 
-        public void Update(Developpeur entity)
+		public List<Developpeur> GetDevByPro(Projet pro)
+		{
+			List<Developpeur> developpeurs = new List<Developpeur>();
+
+			command.Parameters.Clear();
+			command.CommandText = @"
+        SELECT d.id, d.technonlogies
+        FROM Developpeur d
+        WHERE d.projetId = @projetId";
+
+			command.Parameters.AddWithValue("@projetId", pro.Id);
+
+			using (var reader = command.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var dev = new Developpeur
+					{
+						Id = reader.GetInt32(reader.GetOrdinal("id")),
+						Projet = pro,
+						Technologies = rd.IsDBNull(rd.GetOrdinal("technonlogies"))
+						? new List<Technologie>()
+						: rd.GetString(rd.GetOrdinal("technonlogies"))
+							  .Split(',', StringSplitOptions.RemoveEmptyEntries)
+							  .Select(t => Enum.TryParse(t.Trim(), true, out Technologie result) ? result : (Technologie?)null)
+							  .Where(t => t.HasValue)
+							  .Select(t => t.Value)
+							  .ToList(),
+						ServicesAssignes = new List<ServiceProjet>(),
+						Taches = new List<Tache>()
+					};
+
+					
+
+					// Ajout temporaire à la liste
+					developpeurs.Add(dev);
+				}
+			}
+
+			// Chargement des services et tâches pour chaque développeur
+			foreach (var dev in developpeurs)
+			{
+				dev.ServicesAssignes = serviceDAO.getSerByDev(dev);
+				dev.Taches = tacheDAO.GetByIdDeveloppeur(dev);
+				Utilisateur user = utilisateurDAO.GetById(dev.Id);
+				dev.Nom = user.Nom;
+				dev.Prenom = user.Prenom;
+				dev.Role = user.Role;
+				dev.Email = user.Email;
+				dev.MotDePasse = user.MotDePasse;
+			}
+
+			return developpeurs;
+		}
+
+
+		public void Update(Developpeur entity)
         {
             // 2. Mise à jour de la table Developpeur
             command.Parameters.Clear();
@@ -126,6 +186,14 @@ namespace ProjetNet.data
             foreach(Developpeur developpeur in developpeurs)
             {
                 developpeur.Projet = projetDAO.GetById(developpeur.Projet.Id);
+                developpeur.ServicesAssignes = serviceDAO.getSerByDev(developpeur);
+                developpeur.Taches = tacheDAO.GetByIdDeveloppeur(developpeur);
+                Utilisateur user = utilisateurDAO.GetById(developpeur.Id);
+                developpeur.Nom = user.Nom;
+                developpeur.Prenom = user.Prenom;
+                developpeur.Role = user.Role;
+                developpeur.Email = user.Email;
+                developpeur.MotDePasse = user.MotDePasse;
             }
             return developpeurs;
         }

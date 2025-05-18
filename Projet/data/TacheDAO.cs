@@ -10,6 +10,7 @@ namespace ProjetNet.data
         SqlConnection connection;
         SqlCommand command;
         SqlDataReader rd;
+        ServiceDAO serviceDAO;
 
         public TacheDAO()
         {
@@ -17,6 +18,7 @@ namespace ProjetNet.data
             connection.Open();
             command = new SqlCommand();
             command.Connection = connection;
+            serviceDAO = new ServiceDAO();
         }
 
         public void Add(Tache entity)
@@ -82,7 +84,7 @@ namespace ProjetNet.data
             command.ExecuteNonQuery();
         }
 
-        public List<Tache> GetByIdDev(ServiceProjet ser)
+        public List<Tache> GetByIdDeveloppeur(Developpeur dev)
         {
             List<Tache> taches = new List<Tache>();
 
@@ -92,10 +94,10 @@ namespace ProjetNet.data
                 command.CommandText = @"
                     SELECT t.id, t.nom, t.descriptionTache, t.pourcentageAvancement, t.developpeurId, t.serviceId
                     FROM Tache t
-                    WHERE t.IdService = @serviceId and t.developpeurId=@DevId";
+                    WHERE t.developpeurId=@DevId";
 
-                command.Parameters.AddWithValue("@serviceId", ser.Id);
-                command.Parameters.AddWithValue("@DevId", ser.DeveloppeurAssigne.Id);
+                
+                command.Parameters.AddWithValue("@DevId", dev.Id);
 
                 using (var reader = command.ExecuteReader())
                 {
@@ -106,9 +108,9 @@ namespace ProjetNet.data
                             Id = reader.GetInt32(0),
                             Nom = reader.IsDBNull(1) ? null : reader.GetString(1),
                             DescriptionTache = reader.IsDBNull(2) ? null : reader.GetString(2),
-                            Developpeur = ser.DeveloppeurAssigne,
+                            Developpeur = dev,
                             PourcentageAvancement = reader.GetDouble(3),
-                            Service = ser
+                            Service = new ServiceProjet { Id = reader.GetInt32(4)}
                         };
                         taches.Add(tache);
                     }
@@ -120,7 +122,53 @@ namespace ProjetNet.data
                 throw;
             }
 
+            foreach (var tache in taches)
+            {
+                tache.Service = serviceDAO.GetById(tache.Service.Id);
+            }
+
             return taches;
         }
-    }
+
+		public List<Tache> GetByIdService(ServiceProjet ser)
+		{
+			List<Tache> taches = new List<Tache>();
+
+			try
+			{
+				command.Parameters.Clear();
+				command.CommandText = @"
+                    SELECT t.id, t.nom, t.descriptionTache, t.pourcentageAvancement, t.developpeurId, t.serviceId
+                    FROM Tache t
+                    WHERE t.serviceId = @serviceId and t.developpeurId=@DevId";
+
+				command.Parameters.AddWithValue("@serviceId", ser.Id);
+				command.Parameters.AddWithValue("@DevId", ser.DeveloppeurAssigne.Id);
+
+				using (var reader = command.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						Tache tache = new Tache
+						{
+							Id = reader.GetInt32(0),
+							Nom = reader.IsDBNull(1) ? null : reader.GetString(1),
+							DescriptionTache = reader.IsDBNull(2) ? null : reader.GetString(2),
+							Developpeur = ser.DeveloppeurAssigne,
+							PourcentageAvancement = reader.GetDouble(3),
+							Service = ser
+						};
+						taches.Add(tache);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine($"Erreur lors de la récupération des tâches par service: {ex.Message}");
+				throw;
+			}
+
+			return taches;
+		}
+	}
 }

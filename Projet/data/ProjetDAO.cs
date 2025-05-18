@@ -10,7 +10,8 @@ namespace ProjetNet.data
 		SqlCommand command;
 		SqlDataReader rd;
 		UtilisateurDAO utilisateurDAO;
-
+        ServiceDAO serviceDAO;
+        DeveloppeurDAO developpeurDAO;
 		public ProjetDAO()
 		{
 			connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=""C:\Users\oo\Documents\esisa_4eme_annee\Porjet .NET\projet .NET\ProjetGL\Projet\data\db_GL\db_GL.mdf"";Integrated Security=True");
@@ -18,6 +19,7 @@ namespace ProjetNet.data
 			command = new SqlCommand();
 			command.Connection = connection;
 			utilisateurDAO = new UtilisateurDAO();
+            serviceDAO = new ServiceDAO();
 		}
 
 		public void Add(Projet entity)
@@ -121,7 +123,9 @@ namespace ProjetNet.data
                     // Utiliser la valeur enum convertie
                     Methodologie = methodologieEnum,
                     DateReunion = rd.IsDBNull(rd.GetOrdinal("dateReunion")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateReunion")),
-                    Technologies = technologies
+                    Technologies = technologies,
+                    Services = new List<ServiceProjet>(),
+                    Developpeurs = new List<Developpeur>()
                 };
                 projets.Add(projet);
                 technologies.Clear();
@@ -137,6 +141,8 @@ namespace ProjetNet.data
                 {
                     item.ChefProjet = (ChefProjet)utilisateurDAO.GetById(item.ChefProjet.Id);
                 }
+                item.Services = serviceDAO.getSerByPro(item);
+                item.Developpeurs = developpeurDAO.GetDevByPro(item);
             }
             return projets;
         }
@@ -193,8 +199,10 @@ namespace ProjetNet.data
                     // Utiliser la valeur enum convertie
                     Methodologie = methodologieEnum,
                     DateReunion = rd.IsDBNull(rd.GetOrdinal("dateReunion")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateReunion")),
-                    Technologies = technologies
-                };
+                    Technologies = technologies,
+					Services = new List<ServiceProjet>(),
+					Developpeurs = new List<Developpeur>()
+				};
                
             }
             rd.Close();
@@ -206,7 +214,9 @@ namespace ProjetNet.data
                 {
                     projet.ChefProjet = (ChefProjet)utilisateurDAO.GetById(projet.ChefProjet.Id);
                 }
-            return projet;
+			projet.Services = serviceDAO.getSerByPro(projet);
+			projet.Developpeurs = developpeurDAO.GetDevByPro(projet);
+			return projet;
         }
 
 		public Projet GetById(string id)
@@ -258,8 +268,10 @@ namespace ProjetNet.data
                     // Utiliser la valeur enum convertie
                     Methodologie = methodologieEnum,
                     DateReunion = rd.IsDBNull(rd.GetOrdinal("dateReunion")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateReunion")),
-                    Technologies = technologies
-                };
+                    Technologies = technologies,
+					Services = new List<ServiceProjet>(),
+					Developpeurs = new List<Developpeur>()
+				};
 
             }
             rd.Close();
@@ -271,7 +283,9 @@ namespace ProjetNet.data
             {
                 projet.ChefProjet = (ChefProjet)utilisateurDAO.GetById(projet.ChefProjet.Id);
             }
-            return projet;
+			projet.Services = serviceDAO.getSerByPro(projet);
+			projet.Developpeurs = developpeurDAO.GetDevByPro(projet);
+			return projet;
         }
 
 		public void Update(Projet entity)

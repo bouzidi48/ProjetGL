@@ -51,12 +51,48 @@ namespace ProjetNet.data
             throw new NotImplementedException();
         }
 
-        public ServiceProjet GetById(int id)
-        {
-            throw new NotImplementedException();
-        }
+		public ServiceProjet GetById(int id)
+		{
+			ServiceProjet service = null;
 
-        public ServiceProjet GetById(string id)
+			command.Parameters.Clear();
+			command.CommandText = @"
+        SELECT s.id, s.nom, s.descriptionService, s.dureeJours, 
+               s.developpeurAssigneId, s.projetId
+        FROM Service s
+        WHERE s.id = @id";
+			command.Parameters.AddWithValue("@id", id);
+
+			using (var reader = command.ExecuteReader())
+			{
+				if (reader.Read())
+				{
+					int? devId = reader.IsDBNull(reader.GetOrdinal("developpeurAssigneId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("developpeurAssigneId"));
+					int projetId = reader.GetInt32(reader.GetOrdinal("projetId"));
+
+					service = new ServiceProjet
+					{
+						Id = reader.GetInt32(reader.GetOrdinal("id")),
+						Nom = reader.GetString(reader.GetOrdinal("nom")),
+						DescriptionService = reader.IsDBNull(reader.GetOrdinal("descriptionService")) ? null : reader.GetString(reader.GetOrdinal("descriptionService")),
+						DureeJours = reader.GetInt32(reader.GetOrdinal("dureeJours")),
+						DeveloppeurAssigne = devId.HasValue ? new DeveloppeurDAO().GetById(devId.Value) : null,
+						Projet = new ProjetDAO().GetById(projetId), // Assurez-vous que ProjetDAO a bien une méthode GetById
+						Taches = new List<Tache>() // Sera remplie juste après
+					};
+				}
+			}
+
+			if (service != null)
+			{
+				service.Taches = tacheDAO.GetByIdService(service);
+			}
+
+			return service;
+		}
+
+
+		public ServiceProjet GetById(string id)
         {
             throw new NotImplementedException();
         }
@@ -101,13 +137,13 @@ namespace ProjetNet.data
 
             foreach (ServiceProjet service in services)
             {
-                service.Taches = tacheDAO.GetByIdDev(service);
+                service.Taches = tacheDAO.GetByIdService(service);
             }
             return services;
         }
 
 
-        public List<ServiceProjet> getProByDev(Projet pro)
+        public List<ServiceProjet> getSerByPro(Projet pro)
         {
             List<ServiceProjet> services = new List<ServiceProjet>();
 
@@ -141,7 +177,7 @@ namespace ProjetNet.data
             foreach (ServiceProjet service in services)
             {
                 service.DeveloppeurAssigne = new DeveloppeurDAO().GetById(service.DeveloppeurAssigne.Id);
-                service.Taches = tacheDAO.GetByIdDev(service);
+                service.Taches = tacheDAO.GetByIdService(service);
             }
 
             return services;
