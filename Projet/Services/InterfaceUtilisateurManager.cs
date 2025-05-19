@@ -5,5 +5,6 @@ namespace ProjetNet.Services
 	public interface InterfaceUtilisateurManager
 	{
 		public bool connecter (string email, string motDePasse);
+		public Utilisateur GetById(string id);
     }
 }

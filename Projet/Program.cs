@@ -1,4 +1,6 @@
 using ProjetNet.Bussiness;
+using ProjetNet.Data;
+using ProjetNet.Models;
 using ProjetNet.Services;
 
 namespace ProjetNet
@@ -13,11 +15,23 @@ namespace ProjetNet
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddScoped<InterfaceUtilisateurManager, UtilisateurManager>();
+			builder.Services.AddScoped<UtilisateurDAO>();
 
-            var app = builder.Build();
+			builder.Services.AddAuthentication("Cookies").AddCookie(
+				options =>
+				{
+					options.LoginPath = "/Utilisateur/Signin";
+					options.LogoutPath = "/Utilisateur/Signout";
+					options.AccessDeniedPath = "/Home/Error";
+				}
+				);
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
+			var app = builder.Build();
+
+			
+
+			// Configure the HTTP request pipeline.
+			if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
@@ -30,8 +44,8 @@ namespace ProjetNet
             app.UseRouting();
 
             app.UseAuthorization();
-
-            app.MapControllerRoute(
+			app.UseAuthentication();
+			app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 

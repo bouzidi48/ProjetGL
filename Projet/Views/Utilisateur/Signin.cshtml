@@ -1,0 +1,46 @@
+﻿@model ProjetNet.Models.Utilisateur
+
+@{
+    ViewData["Title"] = "Connexion";
+}
+
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
+        <h3 class="text-center mb-4 text-primary">Connexion</h3>
+
+        <form asp-action="Signin" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Adresse email</label>
+                <input asp-for="Email" class="form-control" placeholder="Entrer votre email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="MotDePasse" class="form-label">Mot de passe</label>
+                <input asp-for="MotDePasse" type="password" class="form-control" placeholder="Entrer votre mot de passe" />
+                <span asp-validation-for="MotDePasse" class="text-danger"></span>
+            </div>
+
+            @if (ViewBag.msg != null)
+            {
+                <div class="text-danger mb-3">@ViewBag.msg</div>
+            }
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary">Se connecter</button>
+            </div>
+            <!--
+            <div class="text-center">
+                <span>Pas encore de compte ? <a asp-action="Signup" class="text-decoration-none">Créer un compte</a></span>
+            </div>-->
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -15,11 +15,16 @@ namespace ProjetNet.Bussiness
         public bool connecter(string email, string motDePasse)
         {
             Utilisateur user = data.Authentifier(email, motDePasse);
-            if (user != null && user.MotDePasse != motDePasse) 
+            if (user != null && user.MotDePasse == motDePasse) 
             {
                 return true;
             }
             return false;
         }
-    }
+
+		public Utilisateur GetById(string id)
+		{
+			return data.GetById(id);
+		}
+	}
 }
