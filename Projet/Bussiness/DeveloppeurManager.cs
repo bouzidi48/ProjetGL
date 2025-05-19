@@ -28,6 +28,11 @@ namespace ProjetNet.Bussiness
 			return developpeurDAO.GetById(id);
 		}
 
+		public List<Developpeur> GetDeveParProjet(Projet projet)
+		{
+			return developpeurDAO.GetDevByPro(projet);
+		}
+
 		public List<Developpeur> ListerDeveParTech(List<Technologie> technologies)
 		{
 			return developpeurDAO.GetByTechnos(technologies);

@@ -11,7 +11,7 @@ namespace ProjetNet.data
         SqlCommand command;
         SqlDataReader rd;
         ServiceDAO serviceDAO;
-        DeveloppeurDAO developpeurDAO
+        DeveloppeurDAO developpeurDAO;
 
         public TacheDAO()
         {

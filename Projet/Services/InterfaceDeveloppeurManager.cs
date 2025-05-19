@@ -9,5 +9,7 @@ namespace ProjetNet.Services
 		void ChagerProfile(Developpeur developpeur);
 		void affecterProjet(Developpeur developpeur);
 
+		List<Developpeur> GetDeveParProjet(Projet pro);
+
 	}
 }
