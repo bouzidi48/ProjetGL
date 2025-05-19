@@ -47,8 +47,56 @@ namespace ProjetNet.data
 
         public Developpeur GetById(int id)
         {
-            throw new NotImplementedException();
-        }
+			Developpeur developpeur = new Developpeur();
+
+			command.Parameters.Clear();
+			command.CommandText = @"
+        SELECT d.id, d.technonlogies, d.projetId
+        FROM Developpeur d
+        WHERE d.id = @id";
+
+			command.Parameters.AddWithValue("@id", id);
+
+			using (var reader = command.ExecuteReader())
+			{
+				if (reader.Read())
+				{
+					developpeur = new Developpeur
+					{
+						Id = reader.GetInt32(reader.GetOrdinal("id")),
+						Projet = rd.IsDBNull(rd.GetOrdinal("projetId")) ? null : new Projet { Id = rd.GetInt32(rd.GetOrdinal("projetId")) },
+						Technologies = rd.IsDBNull(rd.GetOrdinal("technonlogies"))
+						? new List<Technologie>()
+						: rd.GetString(rd.GetOrdinal("technonlogies"))
+							  .Split(',', StringSplitOptions.RemoveEmptyEntries)
+							  .Select(t => Enum.TryParse(t.Trim(), true, out Technologie result) ? result : (Technologie?)null)
+							  .Where(t => t.HasValue)
+							  .Select(t => t.Value)
+							  .ToList(),
+						ServicesAssignes = new List<ServiceProjet>(),
+						Taches = new List<Tache>()
+					};
+
+				}
+			}
+
+			if(developpeur != null) {
+                if (developpeur.Projet != null)
+                {
+                    developpeur.Projet = projetDAO.GetById(id);
+                }
+				developpeur.ServicesAssignes = serviceDAO.getSerByDev(developpeur);
+				developpeur.Taches = tacheDAO.GetByIdDeveloppeur(developpeur);
+				Utilisateur user = utilisateurDAO.GetById(developpeur.Id);
+				developpeur.Nom = user.Nom;
+				developpeur.Prenom = user.Prenom;
+				developpeur.Role = user.Role;
+				developpeur.Email = user.Email;
+				developpeur.MotDePasse = user.MotDePasse;
+			}
+
+			return developpeur;
+		}
 
         public Developpeur GetById(string id)
         {
@@ -185,7 +233,10 @@ namespace ProjetNet.data
             rd.Close();
             foreach(Developpeur developpeur in developpeurs)
             {
-                developpeur.Projet = projetDAO.GetById(developpeur.Projet.Id);
+                if(developpeur.Projet != null)
+                {
+					developpeur.Projet = projetDAO.GetById(developpeur.Projet.Id);
+				}
                 developpeur.ServicesAssignes = serviceDAO.getSerByDev(developpeur);
                 developpeur.Taches = tacheDAO.GetByIdDeveloppeur(developpeur);
                 Utilisateur user = utilisateurDAO.GetById(developpeur.Id);

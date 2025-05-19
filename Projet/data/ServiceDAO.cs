@@ -11,6 +11,8 @@ namespace ProjetNet.data
         SqlCommand command;
         SqlDataReader rd;
         TacheDAO tacheDAO;
+        DeveloppeurDAO developpeurDAO;
+        ProjetDAO projetDAO;
 
         public ServiceDAO()
         {
@@ -19,6 +21,8 @@ namespace ProjetNet.data
             command = new SqlCommand();
             command.Connection = connection;
             tacheDAO = new TacheDAO();
+            developpeurDAO = new DeveloppeurDAO();
+            projetDAO = new ProjetDAO();
         }
 
         public void Add(ServiceProjet entity)
@@ -76,8 +80,8 @@ namespace ProjetNet.data
 						Nom = reader.GetString(reader.GetOrdinal("nom")),
 						DescriptionService = reader.IsDBNull(reader.GetOrdinal("descriptionService")) ? null : reader.GetString(reader.GetOrdinal("descriptionService")),
 						DureeJours = reader.GetInt32(reader.GetOrdinal("dureeJours")),
-						DeveloppeurAssigne = devId.HasValue ? new DeveloppeurDAO().GetById(devId.Value) : null,
-						Projet = new ProjetDAO().GetById(projetId), // Assurez-vous que ProjetDAO a bien une méthode GetById
+						DeveloppeurAssigne = rd.IsDBNull(rd.GetOrdinal("developpeurAssigneId")) ? null : new Developpeur { Id = rd.GetInt32(rd.GetOrdinal("developpeurAssigneId")) },
+						Projet = rd.IsDBNull(rd.GetOrdinal("projetId")) ? null : new Projet { Id = rd.GetInt32(rd.GetOrdinal("projetId")) }, // Assurez-vous que ProjetDAO a bien une méthode GetById
 						Taches = new List<Tache>() // Sera remplie juste après
 					};
 				}
@@ -86,6 +90,15 @@ namespace ProjetNet.data
 			if (service != null)
 			{
 				service.Taches = tacheDAO.GetByIdService(service);
+                if (service.DeveloppeurAssigne != null) {
+                    service.DeveloppeurAssigne = developpeurDAO.GetById(service.DeveloppeurAssigne.Id); 
+                }
+                if(service.Projet != null)
+                {
+                    service.Projet = projetDAO.GetById(service.Projet.Id);
+
+				} 
+                
 			}
 
 			return service;

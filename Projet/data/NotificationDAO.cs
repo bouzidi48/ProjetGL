@@ -64,12 +64,15 @@ namespace ProjetNet.data
                     Id = rd.GetInt32(rd.GetOrdinal("id")),
                     Message = rd.IsDBNull(rd.GetOrdinal("message")) ? null : rd.GetString(rd.GetOrdinal("message")),
                     EstLue = rd.IsDBNull(rd.GetOrdinal("estLue")) ? false : rd.GetBoolean(rd.GetOrdinal("estLue")),
-                    Destinataire = rd.IsDBNull(rd.GetOrdinal("IdDestinataire")) ? null :
-                        (Utilisateur)utilisateurDAO.GetById(rd.GetInt32(rd.GetOrdinal("IdDestinataire")))
-                };
+                    Destinataire = rd.IsDBNull(rd.GetOrdinal("IdDestinataire")) ? null : new Utilisateur { Id = rd.GetInt32(rd.GetOrdinal("IdDestinataire")) }
+				};
             }
 
             rd.Close();
+            if (notification.Destinataire != null)
+            {
+                notification.Destinataire = utilisateurDAO.GetById(notification.Destinataire.Id);
+            }
             return notification;
         }
 
@@ -78,29 +81,35 @@ namespace ProjetNet.data
 			throw new NotImplementedException();
 		}
 
-		public Notification GetByIdAndNotLue(int id)
+		public List<Notification> GetByIdAndNotLue(int id)
         {
 			command.Parameters.Clear();
 			command.CommandText = @"SELECT * FROM Notification WHERE IdDestinataire = @id AND estLue = 0";
 			command.Parameters.AddWithValue("@id", id);
 
 			rd = command.ExecuteReader();
-			Notification notification = null;
+			List<Notification> notifications = new List<Notification>();
 
-			if (rd.Read())
+			while (rd.Read())
 			{
-				notification = new Notification
+				Notification notification = new Notification
 				{
 					Id = rd.GetInt32(rd.GetOrdinal("id")),
 					Message = rd.IsDBNull(rd.GetOrdinal("message")) ? null : rd.GetString(rd.GetOrdinal("message")),
 					EstLue = rd.IsDBNull(rd.GetOrdinal("estLue")) ? false : rd.GetBoolean(rd.GetOrdinal("estLue")),
-					Destinataire = rd.IsDBNull(rd.GetOrdinal("IdDestinataire")) ? null :
-						(Utilisateur)utilisateurDAO.GetById(rd.GetInt32(rd.GetOrdinal("IdDestinataire")))
+					Destinataire = rd.IsDBNull(rd.GetOrdinal("IdDestinataire")) ? null : new Utilisateur { Id = rd.GetInt32(rd.GetOrdinal("IdDestinataire")) },
 				};
+                notifications.Add(notification);
 			}
-
 			rd.Close();
-			return notification;
+			foreach (var item in notifications)
+			{
+				if(item.Destinataire != null)
+                {
+					item.Destinataire = utilisateurDAO.GetById(item.Destinataire.Id);
+				}
+			}
+			return notifications;
 		}
 
 		public void Update(Notification entity)

@@ -12,9 +12,14 @@ namespace ProjetNet.Bussiness
             this.data = data;
         }
 
-        public void connecter(string email, string motDePasse)
+        public bool connecter(string email, string motDePasse)
         {
-            data.Authentifier(email, motDePasse);
+            Utilisateur user = data.Authentifier(email, motDePasse);
+            if (user != null && user.MotDePasse != motDePasse) 
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -11,6 +11,7 @@ namespace ProjetNet.data
         SqlCommand command;
         SqlDataReader rd;
         ServiceDAO serviceDAO;
+        DeveloppeurDAO developpeurDAO
 
         public TacheDAO()
         {
@@ -19,6 +20,7 @@ namespace ProjetNet.data
             command = new SqlCommand();
             command.Connection = connection;
             serviceDAO = new ServiceDAO();
+            developpeurDAO = new DeveloppeurDAO();
         }
 
         public void Add(Tache entity)
@@ -55,8 +57,56 @@ namespace ProjetNet.data
 
         public Tache GetById(int id)
         {
-            throw new NotImplementedException();
-        }
+			Tache tache = new Tache();
+
+			try
+			{
+				command.Parameters.Clear();
+				command.CommandText = @"
+                    SELECT t.id, t.nom, t.descriptionTache, t.pourcentageAvancement, t.developpeurId, t.serviceId
+                    FROM Tache t
+                    WHERE t.id=@id";
+
+
+				command.Parameters.AddWithValue("@id", id);
+
+				using (var reader = command.ExecuteReader())
+				{
+					if (reader.Read())
+					{
+						tache = new Tache
+						{
+							Id = reader.GetInt32(0),
+							Nom = reader.IsDBNull(1) ? null : reader.GetString(1),
+							DescriptionTache = reader.IsDBNull(2) ? null : reader.GetString(2),
+							Developpeur = new Developpeur { Id = reader.GetInt32(4) },
+							PourcentageAvancement = reader.GetDouble(3),
+							Service = new ServiceProjet { Id = reader.GetInt32(5) }
+						};
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine($"Erreur lors de la récupération des tâches par service: {ex.Message}");
+				throw;
+			}
+
+			if(tache != null)
+			{
+                if (tache.Developpeur != null)
+                {
+                    tache.Developpeur = developpeurDAO.GetById(tache.Developpeur.Id);
+                }
+                if (tache.Service != null)
+                {
+					tache.Service = serviceDAO.GetById(tache.Service.Id);
+				}
+				
+			}
+
+			return tache;
+		}
 
         public Tache GetById(string id)
         {
@@ -110,7 +160,7 @@ namespace ProjetNet.data
                             DescriptionTache = reader.IsDBNull(2) ? null : reader.GetString(2),
                             Developpeur = dev,
                             PourcentageAvancement = reader.GetDouble(3),
-                            Service = new ServiceProjet { Id = reader.GetInt32(4)}
+                            Service = new ServiceProjet { Id = reader.GetInt32(5)}
                         };
                         taches.Add(tache);
                     }
@@ -124,7 +174,11 @@ namespace ProjetNet.data
 
             foreach (var tache in taches)
             {
-                tache.Service = serviceDAO.GetById(tache.Service.Id);
+                if(tache.Service != null)
+                {
+					tache.Service = serviceDAO.GetById(tache.Service.Id);
+				}
+                
             }
 
             return taches;
