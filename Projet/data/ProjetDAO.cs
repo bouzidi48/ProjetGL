@@ -220,6 +220,79 @@ namespace ProjetNet.data
 			return projets;
 		}
 
+		public List<Projet> GetProjetByDirecteur(int iddir)
+		{
+			command.Parameters.Clear();
+			command.CommandText = @"SELECT * FROM Projet WHERE directeurId = @iddir";
+			command.Parameters.AddWithValue("@iddir", iddir);
+			rd = command.ExecuteReader();
+			List<Projet> projets = new List<Projet>();
+			List<Technologie> technologies = new List<Technologie>();
+			while (rd.Read())
+			{
+				if (!rd.IsDBNull(rd.GetOrdinal("technologies")))
+				{
+					string techString = rd.GetString(rd.GetOrdinal("technologies"));
+					var techSplit = techString.Split(',', StringSplitOptions.RemoveEmptyEntries);
+					foreach (var tech in techSplit)
+					{
+						if (Enum.TryParse<Technologie>(tech.Trim(), true, out var parsedTech))
+						{
+							technologies.Add(parsedTech);
+						}
+					}
+				}
+				Methodologie methodologieEnum = Methodologie.Acune; // Valeur par défaut
+
+				if (!rd.IsDBNull(rd.GetOrdinal("methodologie")))
+				{
+					string methodologieStr = rd.GetString(rd.GetOrdinal("methodologie"));
+
+					// Essayer de convertir la chaîne en enum
+					if (Enum.TryParse(methodologieStr, true, out Methodologie parsedMethodologie))
+					{
+						methodologieEnum = parsedMethodologie;
+					}
+				}
+
+				Projet projet = new Projet
+				{
+					Id = rd.GetInt32(rd.GetOrdinal("id")),
+					Nom = rd.IsDBNull(rd.GetOrdinal("nom")) ? null : rd.GetString(rd.GetOrdinal("nom")),
+					Description = rd.IsDBNull(rd.GetOrdinal("description")) ? null : rd.GetString(rd.GetOrdinal("description")),
+					DateDemarrage = rd.IsDBNull(rd.GetOrdinal("dateDemarrage")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateDemarrage")),
+					DateLivraison = rd.IsDBNull(rd.GetOrdinal("dateLivraison")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateLivraison")),
+					NombreJoursDev = rd.IsDBNull(rd.GetOrdinal("nombreJoursDev")) ? (int?)null : rd.GetInt32(rd.GetOrdinal("nombreJoursDev")),
+					Client = rd.IsDBNull(rd.GetOrdinal("client")) ? null : rd.GetString(rd.GetOrdinal("client")),
+					Directeur = rd.IsDBNull(rd.GetOrdinal("directeurId")) ? null : new DirecteurInformatique { Id = rd.GetInt32(rd.GetOrdinal("directeurId")) },
+					ChefProjet = rd.IsDBNull(rd.GetOrdinal("chefProjetId")) ? null : new ChefProjet { Id = rd.GetInt32(rd.GetOrdinal("chefProjetId")) },
+					// Utiliser la valeur enum convertie
+					Methodologie = methodologieEnum,
+					DateReunion = rd.IsDBNull(rd.GetOrdinal("dateReunion")) ? (DateTime?)null : rd.GetDateTime(rd.GetOrdinal("dateReunion")),
+					Technologies = technologies,
+					Services = new List<ServiceProjet>(),
+					Developpeurs = new List<Developpeur>()
+				};
+				projets.Add(projet);
+				technologies.Clear();
+			}
+			rd.Close();
+			foreach (Projet item in projets)
+			{
+				if (item.Directeur != null)
+				{
+					item.Directeur = (DirecteurInformatique)utilisateurDAO.GetById(item.Directeur.Id);
+				}
+				if (item.ChefProjet != null)
+				{
+					item.ChefProjet = (ChefProjet)utilisateurDAO.GetById(item.ChefProjet.Id);
+				}
+				item.Services = serviceDAO.getSerByPro(item);
+				item.Developpeurs = developpeurDAO.GetDevByPro(item);
+			}
+			return projets;
+		}
+
 		public Projet GetByIdev(int iddev)
 		{
 			Developpeur dev = developpeurDAO.GetById(iddev);

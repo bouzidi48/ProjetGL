@@ -1,16 +1,20 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Evaluation;
 using ProjetNet.Services;
+using ProjetNet.Models;
 
 namespace ProjetNet.Controllers
 {
     public class ProjetController : Controller
     {
         InterfaceProjetManager projetManager;
+        InterfaceUtilisateurManager utilisateurManager;
 
-		public ProjetController(InterfaceProjetManager projetManager)
+		public ProjetController(InterfaceProjetManager projetManager, InterfaceUtilisateurManager interfaceUtilisateurManager)
 		{
 			this.projetManager = projetManager;
+			this.utilisateurManager = interfaceUtilisateurManager;
 		}
 
 
@@ -88,5 +92,34 @@ namespace ProjetNet.Controllers
                 return View();
             }
         }
-    }
+
+		[HttpGet]
+		public IActionResult GetAllProject()
+		{
+            int id = int.Parse(TempData["utilisateurId"].ToString());
+			List<Projet> projets = projetManager.GetProjetParDir(id);
+			return View(projets);
+		}
+
+		[HttpGet]
+		public IActionResult SelectionnerChefProjet(int id)
+		{
+            //int id = int.Parse(TempData["utilisateurId"].ToString());
+            TempData["projetId"] = id;
+			List<Utilisateur> chefprojets = utilisateurManager.GetByRole("Chef Projet");
+			return View(chefprojets);
+		}
+
+		[HttpPost]
+		public IActionResult AffecterChef(int id)
+		{
+            //int id = int.Parse(TempData["utilisateurId"].ToString());
+            int projetId = int.Parse(TempData["projetId"].ToString());
+            Projet projet = projetManager.ConsulterProjet(projetId);
+            projet.ChefProjet = (ChefProjet) utilisateurManager.GetById(id);
+            projetManager.AffecterChefprojet(projet);
+			TempData.Remove("projetId");
+			return RedirectToAction(nameof(GetAllProject), "Project");
+		}
+	}
 }

@@ -47,6 +47,11 @@ namespace ProjetNet.Bussiness
 			return projetDAO.GetByIdev(id);
 		}
 
+		public List<Projet> GetProjetParDir(int id)
+		{
+			return projetDAO.GetProjetByDirecteur(id);
+		}
+
 		public List<Projet> ListerProjets()
 		{
 			return projetDAO.GetAll();

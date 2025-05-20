@@ -26,5 +26,15 @@ namespace ProjetNet.Bussiness
 		{
 			return data.GetById(id);
 		}
+
+		public Utilisateur GetById(int id)
+		{
+			return data.GetById(id);
+		}
+
+		public List<Utilisateur> GetByRole(string role)
+		{
+			return data.GetByRole(role);
+		}
 	}
 }

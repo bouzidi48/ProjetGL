@@ -16,6 +16,8 @@ namespace ProjetNet.Services
 		List<Projet> GetProjetParChef(int id);
 
 		Projet GetProjetParDev(int id);
+
+		List<Projet> GetProjetParDir(int id);
 		
 	}
 }

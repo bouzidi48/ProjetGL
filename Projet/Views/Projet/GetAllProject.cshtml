@@ -1,0 +1,98 @@
+﻿@model IEnumerable<ProjetNet.Models.Projet>
+
+@{
+    ViewData["Title"] = "GetAllProject";
+}
+
+<h1>GetAllProject</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nom)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateDemarrage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateLivraison)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NombreJoursDev)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateReunion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Client)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Methodologie)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ChefProjet.Nom)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Technologies)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nom)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateDemarrage)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateLivraison)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NombreJoursDev)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateReunion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Client)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Methodologie)
+            </td>
+            <td>
+                 @Html.DisplayFor(modelItem => item.ChefProjet.Nom)
+            </td>
+            <td>
+                @string.Join(", ", item.Technologies)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                    @Html.ActionLink("Affecter Chef Projet", "SelectionnerChefProjet", new { id = item.Id })
+                    @Html.ActionLink("Lister Developpeur", "Lister Developpeur", new { /* id=item.PrimaryKey */ })
+                    @Html.ActionLink("Lister Services", "Lister Services", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
