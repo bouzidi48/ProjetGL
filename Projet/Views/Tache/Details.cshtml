@@ -1,0 +1,108 @@
+﻿@model ProjetNet.Models.Tache
+
+@{
+    ViewData["Title"] = "Détails de la tâche";
+    var serviceId = ViewBag.ServiceId;
+}
+
+<h1 class="text-info mt-4">Détails de la tâche</h1>
+@if (Model != null)
+{
+    <!-- Informations sur la tâche -->
+    <div class="card mt-4 shadow-sm p-4">
+        <h4 class="text-primary">Informations de la tâche</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-3">Nom</dt>
+            <dd class="col-sm-9">@(!string.IsNullOrEmpty(Model.Nom) ? Model.Nom : "Non défini")</dd>
+
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">@(!string.IsNullOrEmpty(Model.DescriptionTache) ? Model.DescriptionTache : "Non définie")</dd>
+
+            <dt class="col-sm-3">Avancement</dt>
+            <dd class="col-sm-9">@($"{Model.PourcentageAvancement:0.##}%")</dd>
+
+
+        </dl>
+    </div>
+
+    <!-- Informations du service -->
+    @if (Model.Service != null)
+    {
+        <div class="card mt-4 shadow-sm p-4">
+            <h4 class="text-primary">Informations du service</h4>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-3">Nom du service</dt>
+                <dd class="col-sm-9">@(!string.IsNullOrEmpty(Model.Service.Nom) ? Model.Service.Nom : "Non défini")</dd>
+
+                <dt class="col-sm-3">Description</dt>
+                <dd class="col-sm-9">@(!string.IsNullOrEmpty(Model.Service.DescriptionService) ? Model.Service.DescriptionService : "Non définie")</dd>
+
+                <dt class="col-sm-3">Durée (jours)</dt>
+                <dd class="col-sm-9">@(Model.Service.DureeJours > 0 ? Model.Service.DureeJours.ToString() : "Non définie")</dd>
+
+                <dt class="col-sm-3">Développeur assigné au service</dt>
+                <dd class="col-sm-9">
+                    @(
+                                Model.Service.DeveloppeurAssigne != null
+                                                ? Model.Service.DeveloppeurAssigne.Nom
+                                                : "<span class='text-muted fst-italic'>Aucun développeur assigné</span>"
+                                )
+                </dd>
+            </dl>
+        </div>
+    }
+    else
+    {
+        <p class="mt-4 fst-italic text-muted">Aucun Service assigné.</p>
+    }
+
+    <!-- Informations du développeur -->
+    @if (Model.Developpeur != null)
+    {
+        <div class="card shadow-sm mt-4 p-4">
+            <h5 class="text-secondary mb-4">Développeur de la tâche</h5>
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Technologies</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@(string.IsNullOrEmpty(Model.Developpeur.Nom) ? "Non défini" : Model.Developpeur.Nom)</td>
+                        <td>@(string.IsNullOrEmpty(Model.Developpeur.Prenom) ? "Non défini" : Model.Developpeur.Prenom)</td>
+                        <td>@(string.IsNullOrEmpty(Model.Developpeur.Email) ? "Non défini" : Model.Developpeur.Email)</td>
+                        <td>@(string.IsNullOrEmpty(Model.Developpeur.Role) ? "Non défini" : Model.Developpeur.Role)</td>
+                        <td>
+                            @(
+                                    Model.Developpeur.Technologies != null && Model.Developpeur.Technologies.Any()
+                                            ? string.Join(", ", Model.Developpeur.Technologies)
+                                            : "Aucune technologie"
+                                    )
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="mt-4 fst-italic text-muted">Aucune Developpeur assigné.</p>
+    }
+
+    <!-- Boutons d'action -->
+    <div class="mt-5 d-flex justify-content-between">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Modifier</a>
+        <a asp-action="AfficherTaches" asp-route-id="@serviceId" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+}
+else
+{
+    <p class="mt-4 fst-italic text-muted">Aucune Tache enregistré.</p>
+}

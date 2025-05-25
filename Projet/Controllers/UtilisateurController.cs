@@ -5,6 +5,7 @@ using ProjetNet.Models;
 using ProjetNet.Services;
 using System.Security.Claims;
 
+
 namespace ProjetNet.Controllers
 {
     public class UtilisateurController : Controller
@@ -25,10 +26,11 @@ namespace ProjetNet.Controllers
             return View();
         }
 
-		[HttpGet]
+		[HttpPost]
         public IActionResult Signout()
 		{
 			HttpContext.SignOutAsync("Cookies");
+			HttpContext.Session.Clear();
 			return RedirectToAction("Signin");
 		}
 		[HttpGet]
@@ -44,16 +46,18 @@ namespace ProjetNet.Controllers
 			if (utilisateurManager.connecter(user.Email, user.MotDePasse))
 			{
                 Utilisateur user1 = utilisateurManager.GetById(user.Email);
-				TempData["utilisateurId"] = user1.Id;
-				if (user.Role == "directeur")
+                Console.WriteLine(user1.Role);
+				//TempData["utilisateurId"] = user1.Id;
+				HttpContext.Session.SetInt32("utilisateurId", user1.Id);
+				if (user1.Role == "Directeur")
 				{
-					
-					return RedirectToAction(nameof(Index), "Directeur");
+					Console.WriteLine(user1.Role);
+					return RedirectToAction("GetAllProject", "Projet");
 				}
-				else if(user.Role == "chef projet")
+				else if(user1.Role == "Chef de Projet")
 				{
 
-					return RedirectToAction(nameof(Index), "Chef Projet");
+					return RedirectToAction("Index", "ChefProjet");
 				}
                 else
                 {

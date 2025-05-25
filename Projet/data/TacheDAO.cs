@@ -2,6 +2,7 @@
 using ProjetNet.Models;
 using Microsoft.Data.SqlClient;
 using System.Diagnostics;
+using ProjetNet.data.db_GL;
 
 namespace ProjetNet.data
 {
@@ -10,34 +11,53 @@ namespace ProjetNet.data
         SqlConnection connection;
         SqlCommand command;
         SqlDataReader rd;
-        ServiceDAO serviceDAO;
-        DeveloppeurDAO developpeurDAO;
+        
+    
 
         public TacheDAO()
         {
-            connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=""C:\Users\oo\Documents\esisa_4eme_annee\Porjet .NET\projet .NET\ProjetGL\Projet\data\db_GL\db_GL.mdf"";Integrated Security=True");
-            connection.Open();
-            command = new SqlCommand();
-            command.Connection = connection;
-            serviceDAO = new ServiceDAO();
-            developpeurDAO = new DeveloppeurDAO();
+			connection = DbConnectionFactory.GetOpenConnection();
+			command = new SqlCommand();
+            
         }
 
         public void Add(Tache entity)
         {
-            command.Parameters.Clear();
-            command.CommandText = @"
+            try
+            {
+				if (connection.State != System.Data.ConnectionState.Open)
+				{
+					connection = DbConnectionFactory.GetOpenConnection();
+
+				}
+				command.Connection = connection;
+				command.Parameters.Clear();
+                command.CommandText = @"
                 INSERT INTO Tache (descriptionTache, pourcentageAvancement, developpeurId, serviceId, nom)
                 VALUES (@descriptionTache, @pourcentageAvancement, @developpeurId, @serviceId, @nom)";
 
-            command.Parameters.AddWithValue("@descriptionTache", entity.DescriptionTache ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@pourcentageAvancement", entity.PourcentageAvancement);
-            command.Parameters.AddWithValue("@developpeurId", entity.Developpeur?.Id ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@serviceId", entity.Service?.Id ?? throw new ArgumentNullException("Le service associé ne peut pas être nul."));
-            command.Parameters.AddWithValue("@nom", entity.Nom ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@descriptionTache", entity.DescriptionTache ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@pourcentageAvancement", entity.PourcentageAvancement);
+                command.Parameters.AddWithValue("@developpeurId", entity.Developpeur?.Id ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@serviceId", entity.Service?.Id ?? throw new ArgumentNullException("Le service associé ne peut pas être nul."));
+                command.Parameters.AddWithValue("@nom", entity.Nom ?? (object)DBNull.Value);
 
-            command.ExecuteNonQuery();
-        }
+                command.ExecuteNonQuery();
+            }
+			finally
+			{
+				if (rd != null && !rd.IsClosed)
+					rd.Close();
+
+				if (connection != null && connection.State == System.Data.ConnectionState.Open)
+				{
+					connection.Close();
+					
+					connection.Dispose();
+					command.Dispose();
+				}
+			}
+		}
 
 
         public void Delete(int id)
@@ -57,55 +77,60 @@ namespace ProjetNet.data
 
         public Tache GetById(int id)
         {
-			Tache tache = new Tache();
+            try
+            {
+				if (connection.State != System.Data.ConnectionState.Open)
+				{
+					connection = DbConnectionFactory.GetOpenConnection();
 
-			try
-			{
-				command.Parameters.Clear();
-				command.CommandText = @"
+				}
+				command.Connection = connection;
+				Tache tache = new Tache();
+
+
+                command.Parameters.Clear();
+                command.CommandText = @"
                     SELECT t.id, t.nom, t.descriptionTache, t.pourcentageAvancement, t.developpeurId, t.serviceId
                     FROM Tache t
                     WHERE t.id=@id";
 
 
-				command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@id", id);
 
-				using (var reader = command.ExecuteReader())
-				{
-					if (reader.Read())
-					{
-						tache = new Tache
-						{
-							Id = reader.GetInt32(0),
-							Nom = reader.IsDBNull(1) ? null : reader.GetString(1),
-							DescriptionTache = reader.IsDBNull(2) ? null : reader.GetString(2),
-							Developpeur = new Developpeur { Id = reader.GetInt32(4) },
-							PourcentageAvancement = reader.GetDouble(3),
-							Service = new ServiceProjet { Id = reader.GetInt32(5) }
-						};
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine($"Erreur lors de la récupération des tâches par service: {ex.Message}");
-				throw;
-			}
-
-			if(tache != null)
-			{
-                if (tache.Developpeur != null)
+                using (var reader = command.ExecuteReader())
                 {
-                    tache.Developpeur = developpeurDAO.GetById(tache.Developpeur.Id);
+                    if (reader.Read())
+                    {
+                        tache = new Tache
+                        {
+                            Id = reader.GetInt32(0),
+                            Nom = reader.IsDBNull(1) ? null : reader.GetString(1),
+                            DescriptionTache = reader.IsDBNull(2) ? null : reader.GetString(2),
+                            Developpeur = new Developpeur { Id = reader.GetInt32(4) },
+                            PourcentageAvancement = reader.GetDouble(3),
+                            Service = new ServiceProjet { Id = reader.GetInt32(5) }
+                        };
+                    }
                 }
-                if (tache.Service != null)
-                {
-					tache.Service = serviceDAO.GetById(tache.Service.Id);
-				}
-				
-			}
 
-			return tache;
+
+
+
+                return tache;
+            }
+			finally
+			{
+				if (rd != null && !rd.IsClosed)
+					rd.Close();
+
+				if (connection != null && connection.State == System.Data.ConnectionState.Open)
+				{
+					connection.Close();
+					
+					connection.Dispose();
+					command.Dispose();
+				}
+			}
 		}
 
         public Tache GetById(string id)
@@ -115,39 +140,126 @@ namespace ProjetNet.data
 
         public void Update(Tache entity)
         {
-            command.Parameters.Clear();
-            command.CommandText = @"
+            try
+            {
+				if (connection.State != System.Data.ConnectionState.Open)
+				{
+					connection = DbConnectionFactory.GetOpenConnection();
+
+				}
+				command.Connection = connection;
+				command.Parameters.Clear();
+                command.CommandText = @"
                     UPDATE Tache 
                     SET 
-                        DescriptionTache = @descriptionTache,
-                        PourcentageAvancement = @pourcentageAvancement,
-                        IdDeveloppeur = @developpeurId,
-                        IdService = @serviceId,
-                        Nom = @nom
+                        descriptionTache = @descriptionTache,
+                        pourcentageAvancement = @pourcentageAvancement,
+                        developpeurId = @developpeurId,
+                        serviceId = @serviceId,
+                        nom = @nom
                     WHERE Id = @id";
-            command.Parameters.AddWithValue("@id", entity.Id);
-            command.Parameters.AddWithValue("@descriptionTache", entity.DescriptionTache ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@pourcentageAvancement", entity.PourcentageAvancement);
-            command.Parameters.AddWithValue("@developpeurId", entity.Developpeur?.Id ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@serviceId", entity.Service?.Id ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@nom", entity.Nom ?? (object)DBNull.Value);
-            command.ExecuteNonQuery();
-        }
+                command.Parameters.AddWithValue("@id", entity.Id);
+                command.Parameters.AddWithValue("@descriptionTache", entity.DescriptionTache ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@pourcentageAvancement", entity.PourcentageAvancement);
+                command.Parameters.AddWithValue("@developpeurId", entity.Developpeur?.Id ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@serviceId", entity.Service?.Id ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@nom", entity.Nom ?? (object)DBNull.Value);
+                command.ExecuteNonQuery();
+            }
+			finally
+			{
+				if (rd != null && !rd.IsClosed)
+					rd.Close();
+
+				if (connection != null && connection.State == System.Data.ConnectionState.Open)
+				{
+					connection.Close();
+					
+					connection.Dispose();
+					command.Dispose();
+				}
+			}
+		}
 
         public List<Tache> GetByIdDeveloppeur(Developpeur dev)
         {
-            List<Tache> taches = new List<Tache>();
-
             try
             {
-                command.Parameters.Clear();
-                command.CommandText = @"
+				if (connection.State != System.Data.ConnectionState.Open)
+				{
+					connection = DbConnectionFactory.GetOpenConnection();
+
+				}
+				command.Connection = connection;
+				List<Tache> taches = new List<Tache>();
+
+                
+                    command.Parameters.Clear();
+                    command.CommandText = @"
                     SELECT t.id, t.nom, t.descriptionTache, t.pourcentageAvancement, t.developpeurId, t.serviceId
                     FROM Tache t
                     WHERE t.developpeurId=@DevId";
 
-                
-                command.Parameters.AddWithValue("@DevId", dev.Id);
+
+                    command.Parameters.AddWithValue("@DevId", dev.Id);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Tache tache = new Tache
+                            {
+                                Id = reader.GetInt32(0),
+                                Nom = reader.IsDBNull(1) ? null : reader.GetString(1),
+                                DescriptionTache = reader.IsDBNull(2) ? null : reader.GetString(2),
+                                Developpeur = dev,
+                                PourcentageAvancement = reader.GetDouble(3),
+                                Service = new ServiceProjet { Id = reader.GetInt32(5) }
+                            };
+                            taches.Add(tache);
+                        }
+                    }
+               
+
+
+                return taches;
+            }
+			finally
+			{
+				if (rd != null && !rd.IsClosed)
+					rd.Close();
+
+				if (connection != null && connection.State == System.Data.ConnectionState.Open)
+				{
+					connection.Close();
+					
+					connection.Dispose();
+					command.Dispose();
+				}
+			}
+		}
+
+		public List<Tache> GetByIdService(ServiceProjet ser)
+		{
+            try
+            {
+				if (connection.State != System.Data.ConnectionState.Open)
+				{
+					connection = DbConnectionFactory.GetOpenConnection();
+					
+				}
+				command.Connection = connection;
+				List<Tache> taches = new List<Tache>();
+
+
+                command.Parameters.Clear();
+                command.CommandText = @"
+                    SELECT id, nom, descriptionTache, pourcentageAvancement, developpeurId, serviceId
+                    FROM Tache
+                    WHERE serviceId = @serviceId and developpeurId=@DevId";
+
+                command.Parameters.AddWithValue("@serviceId", ser.Id);
+                command.Parameters.AddWithValue("@DevId", ser.DeveloppeurAssigne.Id);
 
                 using (var reader = command.ExecuteReader())
                 {
@@ -158,71 +270,30 @@ namespace ProjetNet.data
                             Id = reader.GetInt32(0),
                             Nom = reader.IsDBNull(1) ? null : reader.GetString(1),
                             DescriptionTache = reader.IsDBNull(2) ? null : reader.GetString(2),
-                            Developpeur = dev,
+                            Developpeur = ser.DeveloppeurAssigne,
                             PourcentageAvancement = reader.GetDouble(3),
-                            Service = new ServiceProjet { Id = reader.GetInt32(5)}
+                            Service = ser
                         };
                         taches.Add(tache);
                     }
                 }
+
+
+                return taches;
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Erreur lors de la récupération des tâches par service: {ex.Message}");
-                throw;
-            }
-
-            foreach (var tache in taches)
-            {
-                if(tache.Service != null)
-                {
-					tache.Service = serviceDAO.GetById(tache.Service.Id);
-				}
-                
-            }
-
-            return taches;
-        }
-
-		public List<Tache> GetByIdService(ServiceProjet ser)
-		{
-			List<Tache> taches = new List<Tache>();
-
-			try
+			finally
 			{
-				command.Parameters.Clear();
-				command.CommandText = @"
-                    SELECT t.id, t.nom, t.descriptionTache, t.pourcentageAvancement, t.developpeurId, t.serviceId
-                    FROM Tache t
-                    WHERE t.serviceId = @serviceId and t.developpeurId=@DevId";
+				if (rd != null && !rd.IsClosed)
+					rd.Close();
 
-				command.Parameters.AddWithValue("@serviceId", ser.Id);
-				command.Parameters.AddWithValue("@DevId", ser.DeveloppeurAssigne.Id);
-
-				using (var reader = command.ExecuteReader())
+				if (connection != null && connection.State == System.Data.ConnectionState.Open)
 				{
-					while (reader.Read())
-					{
-						Tache tache = new Tache
-						{
-							Id = reader.GetInt32(0),
-							Nom = reader.IsDBNull(1) ? null : reader.GetString(1),
-							DescriptionTache = reader.IsDBNull(2) ? null : reader.GetString(2),
-							Developpeur = ser.DeveloppeurAssigne,
-							PourcentageAvancement = reader.GetDouble(3),
-							Service = ser
-						};
-						taches.Add(tache);
-					}
+					connection.Close();
+					
+					connection.Dispose();
+					command.Dispose();
 				}
 			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine($"Erreur lors de la récupération des tâches par service: {ex.Message}");
-				throw;
-			}
-
-			return taches;
 		}
 	}
 }

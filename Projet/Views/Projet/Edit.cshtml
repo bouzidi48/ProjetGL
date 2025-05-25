@@ -1,0 +1,73 @@
+﻿@model ProjetNet.Models.Projet
+
+@{
+    ViewData["Title"] = "Modifier le Projet";
+}
+
+<h1 class="mt-4 mb-4 text-primary">Modifier un projet</h1>
+
+<div class="card shadow-sm p-4">
+    <form asp-action="Edit">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <input type="hidden" asp-for="Id" />
+
+        <!-- Nom -->
+        <div class="mb-3">
+            <label asp-for="Nom" class="form-label fw-bold"></label>
+            <input asp-for="Nom" class="form-control" placeholder="Nom unique du projet" />
+            <span asp-validation-for="Nom" class="text-danger"></span>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label fw-bold"></label>
+            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Description du projet"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <!-- Client -->
+        <div class="mb-3">
+            <label asp-for="Client" class="form-label fw-bold"></label>
+            <input asp-for="Client" class="form-control" placeholder="Nom du client" />
+            <span asp-validation-for="Client" class="text-danger"></span>
+        </div>
+
+        <!-- Dates -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="DateDemarrage" class="form-label fw-bold"></label>
+                <input asp-for="DateDemarrage" class="form-control" type="date" />
+                <span asp-validation-for="DateDemarrage" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="DateLivraison" class="form-label fw-bold"></label>
+                <input asp-for="DateLivraison" class="form-control" type="date" />
+                <span asp-validation-for="DateLivraison" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Nombre de jours -->
+        <div class="mb-3">
+            <label asp-for="NombreJoursDev" class="form-label fw-bold"></label>
+            <input asp-for="NombreJoursDev" class="form-control" type="number" min="1" />
+            <span asp-validation-for="NombreJoursDev" class="text-danger"></span>
+        </div>
+
+        
+
+       
+
+        
+
+        <!-- Boutons -->
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-action="GetAllProject" class="btn btn-secondary">Retour à la liste</a>
+            <input type="submit" value="Enregistrer les modifications" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -1,0 +1,56 @@
+﻿@model IEnumerable<ProjetNet.Models.ServiceProjet>
+
+@{
+    ViewData["Title"] = "Liste des services Chef de Projet";
+}
+
+<h1 class="mt-4 text-primary">Liste des services</h1>
+<div class="mb-3 text-end">
+    <a asp-action="Create" class="btn btn-success">Créer un nouveau Service</a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="card shadow-sm mt-4 p-4">
+        <h5 class="text-secondary mb-4">Services enregistrés</h5>
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nom du service</th>
+                    <th>Description</th>
+                    <th>Durée (jours)</th>
+                    <th>Développeur assigné</th>
+                    <th>Actions</th> <!-- Nouvelle colonne -->
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var service in Model)
+                {
+                    <tr>
+                        <td>@(string.IsNullOrEmpty(service.Nom) ? "Non défini" : service.Nom)</td>
+                        <td>@(string.IsNullOrEmpty(service.DescriptionService) ? "Non définie" : service.DescriptionService)</td>
+                        <td>@(service.DureeJours.ToString() ?? "Non défini")</td>
+                        <td>
+                            @(service.DeveloppeurAssigne != null && !string.IsNullOrEmpty(service.DeveloppeurAssigne.Nom)
+                                ? service.DeveloppeurAssigne.Nom
+                                : "Aucun développeur assigné")
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@service.Id" class="btn btn-primary btn-sm">
+                                Détails
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="mt-4 fst-italic text-muted">Aucun service à afficher pour le moment.</p>
+}
+
+<div class="mt-4">
+    <a asp-action="ListerProjetChefProjet" asp-controller="Projet" class="btn btn-secondary">Retour à la liste des projets</a>
+</div>

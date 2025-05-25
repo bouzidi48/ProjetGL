@@ -1,0 +1,56 @@
+﻿@model ProjetNet.Models.Developpeur
+@{
+    ViewData["Title"] = "Changer Profil";
+    var allTechnologies = ViewBag.AllTechnologies as List<ProjetNet.Models.Technologie>;
+}
+
+<h2 class="text-primary mt-4">Modifier le Profil</h2>
+
+<form asp-action="EnregistrerProfil" method="post">
+    <div class="card mt-3 p-4 shadow-sm">
+        <h4 class="text-info">Informations Personnelles</h4>
+        <hr />
+        <div class="mb-3">
+            <label class="form-label">Nom</label>
+            <input asp-for="Nom" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Prénom</label>
+            <input asp-for="Prenom" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" />
+        </div>
+    </div>
+
+    <div class="card mt-4 p-4 shadow-sm">
+        <h4 class="text-info">Technologies utilisées</h4>
+        <hr />
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Sélectionner</th>
+                    <th>Technologie</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tech in allTechnologies)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="Technologies" value="@tech"
+                            @(Model.Technologies != null && Model.Technologies.Contains(tech) ? "checked" : "") />
+                        </td>
+                        <td>@tech</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-3 text-end">
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+    </div>
+</form>

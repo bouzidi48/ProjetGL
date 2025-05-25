@@ -1,0 +1,79 @@
+﻿@model ProjetNet.Models.Projet
+
+@{
+    ViewData["Title"] = "Créer un projet";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Créer un nouveau projet</h4>
+                </div>
+                <div class="card-body">
+                    @* Affichage du message d'erreur si le nom existe *@
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">
+                            @ViewBag.Error
+                        </div>
+                    }
+
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Nom" class="form-label"></label>
+                            <input asp-for="Nom" class="form-control" />
+                            <span asp-validation-for="Nom" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DateDemarrage" class="form-label"></label>
+                            <input asp-for="DateDemarrage" type="date" class="form-control" />
+                            <span asp-validation-for="DateDemarrage" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DateLivraison" class="form-label"></label>
+                            <input asp-for="DateLivraison" type="date" class="form-control" />
+                            <span asp-validation-for="DateLivraison" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NombreJoursDev" class="form-label"></label>
+                            <input asp-for="NombreJoursDev" type="number" class="form-control" />
+                            <span asp-validation-for="NombreJoursDev" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Client" class="form-label"></label>
+                            <input asp-for="Client" class="form-control" />
+                            <span asp-validation-for="Client" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid">
+                            <input type="submit" value="Create" class="btn btn-primary" />
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-end">
+                    <a asp-action="GetAllProject" class="btn btn-link">Retour à la liste</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

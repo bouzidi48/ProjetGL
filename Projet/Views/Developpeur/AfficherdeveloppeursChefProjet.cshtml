@@ -1,0 +1,51 @@
+﻿@model IEnumerable<ProjetNet.Models.Developpeur>
+
+@{
+    ViewData["Title"] = "Liste des développeurs";
+}
+
+<h1 class="mt-4 text-primary">Liste des développeurs</h1>
+
+@if (Model != null && Model.Any())
+{
+    <div class="card shadow-sm mt-4 p-4">
+        <h5 class="text-secondary mb-4">Équipe de développement</h5>
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Technologies</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var dev in Model)
+                {
+                    <tr>
+                        <td>@(string.IsNullOrEmpty(dev.Nom) ? "Non défini" : dev.Nom)</td>
+                        <td>@(string.IsNullOrEmpty(dev.Prenom) ? "Non défini" : dev.Prenom)</td>
+                        <td>@(string.IsNullOrEmpty(dev.Email) ? "Non défini" : dev.Email)</td>
+                        <td>@(string.IsNullOrEmpty(dev.Role) ? "Non défini" : dev.Role)</td>
+                        <td>
+                            @(dev.Technologies != null && dev.Technologies.Any()
+                                ? string.Join(", ", dev.Technologies)
+                                : "Aucune technologie")
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="mt-4 fst-italic text-muted">Aucun développeur enregistré.</p>
+}
+
+<div class="mt-4">
+    <a asp-action="ListerProjetChefProjet" asp-controller="Projet" class="btn btn-secondary">Retour à la liste des projets</a>
+</div>

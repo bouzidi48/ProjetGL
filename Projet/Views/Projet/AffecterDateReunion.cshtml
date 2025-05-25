@@ -1,0 +1,36 @@
+﻿@model ProjetNet.Models.Projet
+
+@{
+    ViewData["Title"] = "Affecter une date de réunion";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Affecter une date de réunion</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="AffecterDateReunion" asp-route-id="@Model.Id" method="post">
+                <div class="mb-3">
+                    <label asp-for="DateReunion" class="form-label fw-bold">Date de réunion</label>
+                    <input asp-for="DateReunion" class="form-control" type="datetime-local" required />
+                    <span asp-validation-for="DateReunion" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-calendar-plus me-1"></i> Enregistrer la date
+                    </button>
+
+                    <a asp-action="ListerProjetChefProjet" asp-controller="Developpeur" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Retour à la liste des projets
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

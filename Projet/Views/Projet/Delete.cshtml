@@ -1,0 +1,120 @@
+﻿@model ProjetNet.Models.Projet
+
+@{
+    ViewData["Title"] = "Supprimer le projet";
+}
+
+<h1 class="text-danger mt-4">Supprimer le projet</h1>
+
+<h3>Êtes-vous sûr de vouloir supprimer ce projet ?</h3>
+
+<div class="card mt-4 shadow-sm p-4">
+    <h4 class="text-primary">Détails du projet</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Nom</dt>
+        <dd class="col-sm-9">@(!string.IsNullOrEmpty(Model.Nom) ? Model.Nom : "Non défini")</dd>
+
+        <dt class="col-sm-3">Description</dt>
+        <dd class="col-sm-9">@(!string.IsNullOrEmpty(Model.Description) ? Model.Description : "Non définie")</dd>
+
+        <dt class="col-sm-3">Client</dt>
+        <dd class="col-sm-9">@(!string.IsNullOrEmpty(Model.Client) ? Model.Client : "Non défini")</dd>
+
+        <dt class="col-sm-3">Date de démarrage</dt>
+        <dd class="col-sm-9">@Model.DateDemarrage?.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Date de livraison</dt>
+        <dd class="col-sm-9">@Model.DateLivraison?.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Nombre de jours</dt>
+        <dd class="col-sm-9">@Model.NombreJoursDev?.ToString()</dd>
+
+        <dt class="col-sm-3">Date de réunion</dt>
+        <dd class="col-sm-9">@Model.DateReunion?.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Méthodologie</dt>
+        <dd class="col-sm-9">@Model.Methodologie?.ToString()</dd>
+
+        <dt class="col-sm-3">Technologies utilisées</dt>
+        <dd class="col-sm-9">
+            @(Model.Technologies != null && Model.Technologies.Any() ? string.Join(", ", Model.Technologies) : "NULL")
+        </dd>
+    </dl>
+</div>
+
+<!-- TABLEAU : SERVICES -->
+@if (Model.Services != null && Model.Services.Any())
+{
+    <div class="mt-5">
+        <h5 class="text-secondary">Services associés</h5>
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nom du service</th>
+                    <th>Description</th>
+                    <th>Durée (jours)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var service in Model.Services)
+                {
+                    <tr>
+                        <td>@(service.Nom ?? "Non défini")</td>
+                        <td>@(service.DescriptionService ?? "Non définie")</td>
+                        <td>@(service.DureeJours.ToString() ?? "Non défini")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="mt-4 fst-italic text-muted">Aucun service associé.</p>
+}
+
+<!-- TABLEAU : DÉVELOPPEURS -->
+@if (Model.Developpeurs != null && Model.Developpeurs.Any())
+{
+    <div class="mt-4">
+        <h5 class="text-secondary">Équipe de développeurs</h5>
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Technologies</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var dev in Model.Developpeurs)
+                {
+                    <tr>
+                        <td>@(dev.Nom ?? "Non défini")</td>
+                        <td>@(dev.Email ?? "Non défini")</td>
+                        <td>
+                            
+                        @(dev.Technologies != null && dev.Technologies.Any() ? string.Join(", ", dev.Technologies) : "NULL")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="mt-4 fst-italic text-muted">Aucun développeur affecté.</p>
+}
+
+
+
+<!-- Formulaire de suppression -->
+<form asp-action="Delete" method="post" class="mt-5">
+    <input type="hidden" asp-for="Id" />
+    <div class="d-flex justify-content-between">
+        <a asp-action="GetAllProject" class="btn btn-secondary">Retour à la liste</a>
+        <input type="submit" value="Supprimer" class="btn btn-danger" />
+    </div>
+</form>

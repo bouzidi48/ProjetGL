@@ -1,0 +1,61 @@
+﻿@model IEnumerable<ProjetNet.Models.Notification>
+
+@{
+    ViewData["Title"] = "Liste des notifications";
+}
+
+<h2 class="mb-4 text-primary">📢 Notifications reçues</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Aucune notification disponible.</div>
+}
+else
+{
+    <table class="table table-bordered table-hover align-middle shadow-sm">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Message</th>
+                <th>Destinataire</th>
+                <th>État</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(item.EstLue ? "table-success" : "table-warning")">
+                    <td>@item.Id</td>
+                    <td>@item.Message</td>
+                    <td>@item.Destinataire?.Nom @item.Destinataire?.Prenom</td>
+                    <td>
+                        @if (item.EstLue)
+                        {
+                            <span class="badge bg-success">Lue</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Non lue</span>
+                        }
+                    </td>
+                    <td>
+                        @if (!item.EstLue)
+                        {
+                            <form asp-action="MarquerCommeLue" asp-controller="Notification" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">
+                                    ✅ Marquer comme lue
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Aucune action</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

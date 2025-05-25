@@ -14,7 +14,7 @@
 
 		public string Client { get; set; }
 		public ChefProjet ChefProjet { get; set; }
-		public Methodologie Methodologie { get; set; }
+		public Methodologie? Methodologie { get; set; }
 		public List<ServiceProjet> Services { get; set; }
 		public List<Developpeur> Developpeurs { get; set; }
 		public List<Technologie> Technologies { get; set; }

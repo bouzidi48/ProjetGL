@@ -1,0 +1,55 @@
+﻿@model IEnumerable<ProjetNet.Models.Projet>
+
+@{
+    ViewData["Title"] = "ListerProjetChefProjet";
+}
+
+<h1 class="my-4 text-center text-primary">Liste des Projets</h1>
+
+<table class="table table-bordered table-hover table-striped align-middle">
+    <thead class="table-dark text-center">
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Id)</th>
+            <th>@Html.DisplayNameFor(model => model.Nom)</th>
+            <th>@Html.DisplayNameFor(model => model.Description)</th>
+            <th>@Html.DisplayNameFor(model => model.DateDemarrage)</th>
+            <th>@Html.DisplayNameFor(model => model.DateLivraison)</th>
+            <th>@Html.DisplayNameFor(model => model.NombreJoursDev)</th>
+            <th>@Html.DisplayNameFor(model => model.DateReunion)</th>
+            <th>@Html.DisplayNameFor(model => model.Client)</th>
+            <th>@Html.DisplayNameFor(model => model.Methodologie)</th>
+            <th>@Html.DisplayNameFor(model => model.ChefProjet.Nom)</th>
+            <th>@Html.DisplayNameFor(model => model.Technologies)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="text-center">@item.Id</td>
+                <td>@(string.IsNullOrEmpty(item.Nom) ? "NULL" : item.Nom)</td>
+                <td>@(string.IsNullOrEmpty(item.Description) ? "NULL" : item.Description)</td>
+                <td>@(item.DateDemarrage?.ToString("dd/MM/yyyy") ?? "NULL")</td>
+                <td>@(item.DateLivraison?.ToString("dd/MM/yyyy") ?? "NULL")</td>
+                <td>@(item.NombreJoursDev.HasValue ? item.NombreJoursDev.ToString() : "NULL")</td>
+                <td>@(item.DateReunion?.ToString("dd/MM/yyyy") ?? "NULL")</td>
+                <td>@(string.IsNullOrEmpty(item.Client) ? "NULL" : item.Client)</td>
+                <td>
+                    @(Enum.IsDefined(typeof(ProjetNet.Models.Methodologie), item.Methodologie)
+                        ? item.Methodologie.ToString()
+                        : "NULL")
+                </td>
+                <td>@(item.ChefProjet != null ? item.ChefProjet.Nom : "NULL")</td>
+                <td>@(item.Technologies != null && item.Technologies.Any() ? string.Join(", ", item.Technologies) : "NULL")</td>
+                <td class="text-nowrap">
+                    <a asp-action="EditMethoTech" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-1">Ajouter Techno et Methodologie</a>
+                    <a asp-action="DetailsChefProjet" asp-route-id="@item.Id" class="btn btn-sm btn-info me-1">Détails</a>
+                    <a asp-action="AffecterDateReunion" asp-route-id="@item.Id" class="btn btn-sm btn-danger me-1">AffecterDateReunion</a>
+                    <a asp-action="AfficherdeveloppeursChefProjet" asp-controller="Developpeur" asp-route-id="@item.Id" class="btn btn-sm btn-primary me-1">DéveloppeursAfféctées</a>
+                    <a asp-action="AfficherServicesChefProjet" asp-controller="Service" asp-route-id="@item.Id" class="btn btn-sm btn-dark">ServicesProjets</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

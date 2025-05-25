@@ -32,5 +32,6 @@ namespace ProjetNet.Bussiness
 		{
 			return notificationDAO.GetById(id);
 		}
+
 	}
 }

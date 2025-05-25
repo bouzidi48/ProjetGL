@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using ProjetNet.data.db_GL;
 using ProjetNet.Data;
 using ProjetNet.Models;
 
@@ -10,19 +11,15 @@ namespace ProjetNet.data
         SqlCommand command;
         SqlDataReader rd;
         UtilisateurDAO utilisateurDAO;
-        ProjetDAO projetDAO;
-        ServiceDAO serviceDAO;
-        TacheDAO tacheDAO;
+        
+        
         public DeveloppeurDAO()
         {
-            connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=""C:\Users\oo\Documents\esisa_4eme_annee\Porjet .NET\projet .NET\ProjetGL\Projet\data\db_GL\db_GL.mdf"";Integrated Security=True");
-            connection.Open();
-            command = new SqlCommand();
-            command.Connection = connection;
+			connection = DbConnectionFactory.GetOpenConnection();
+			command = new SqlCommand();
             utilisateurDAO = new UtilisateurDAO();
-            projetDAO = new ProjetDAO();
-            serviceDAO = new ServiceDAO();
-            tacheDAO = new TacheDAO();
+            
+            
         }
 
         public void Add(Developpeur entity)
@@ -47,55 +44,75 @@ namespace ProjetNet.data
 
         public Developpeur GetById(int id)
         {
-			Developpeur developpeur = new Developpeur();
+            try
+            {
+				if (connection.State != System.Data.ConnectionState.Open)
+				{
+					connection = DbConnectionFactory.GetOpenConnection();
 
-			command.Parameters.Clear();
-			command.CommandText = @"
+				}
+				command.Connection = connection;
+				Developpeur developpeur = null;
+
+				command.Parameters.Clear();
+				command.CommandText = @"
         SELECT d.id, d.technonlogies, d.projetId
         FROM Developpeur d
         WHERE d.id = @id";
 
-			command.Parameters.AddWithValue("@id", id);
+				command.Parameters.AddWithValue("@id", id);
 
-			using (var reader = command.ExecuteReader())
-			{
-				if (reader.Read())
+				using (var reader = command.ExecuteReader())
 				{
-					developpeur = new Developpeur
+					if (reader.Read())
 					{
-						Id = reader.GetInt32(reader.GetOrdinal("id")),
-						Projet = rd.IsDBNull(rd.GetOrdinal("projetId")) ? null : new Projet { Id = rd.GetInt32(rd.GetOrdinal("projetId")) },
-						Technologies = rd.IsDBNull(rd.GetOrdinal("technonlogies"))
-						? new List<Technologie>()
-						: rd.GetString(rd.GetOrdinal("technonlogies"))
-							  .Split(',', StringSplitOptions.RemoveEmptyEntries)
-							  .Select(t => Enum.TryParse(t.Trim(), true, out Technologie result) ? result : (Technologie?)null)
-							  .Where(t => t.HasValue)
-							  .Select(t => t.Value)
-							  .ToList(),
-						ServicesAssignes = new List<ServiceProjet>(),
-						Taches = new List<Tache>()
-					};
+						developpeur = new Developpeur
+						{
+							Id = reader.GetInt32(reader.GetOrdinal("id")),
+							Projet = reader.IsDBNull(reader.GetOrdinal("projetId")) ? null : new Projet { Id = reader.GetInt32(reader.GetOrdinal("projetId")) },
+							Technologies = reader.IsDBNull(reader.GetOrdinal("technonlogies"))
+							? new List<Technologie>()
+							: reader.GetString(reader.GetOrdinal("technonlogies"))
+								  .Split(',', StringSplitOptions.RemoveEmptyEntries)
+								  .Select(t => Enum.TryParse(t.Trim(), true, out Technologie result) ? result : (Technologie?)null)
+								  .Where(t => t.HasValue)
+								  .Select(t => t.Value)
+								  .ToList(),
+							ServicesAssignes = new List<ServiceProjet>(),
+							Taches = new List<Tache>()
+						};
 
+					}
+				}
+
+				if (developpeur != null)
+				{
+
+
+
+					Utilisateur user = utilisateurDAO.GetById(developpeur.Id);
+					developpeur.Nom = user.Nom;
+					developpeur.Prenom = user.Prenom;
+					developpeur.Role = user.Role;
+					developpeur.Email = user.Email;
+					developpeur.MotDePasse = user.MotDePasse;
+				}
+
+				return developpeur;
+			}
+			finally
+			{
+				if (rd != null && !rd.IsClosed)
+					rd.Close();
+
+				if (connection != null && connection.State == System.Data.ConnectionState.Open)
+				{
+					connection.Close();
+					
+					connection.Dispose();
+					command.Dispose();
 				}
 			}
-
-			if(developpeur != null) {
-                if (developpeur.Projet != null)
-                {
-                    developpeur.Projet = projetDAO.GetById(id);
-                }
-				developpeur.ServicesAssignes = serviceDAO.getSerByDev(developpeur);
-				developpeur.Taches = tacheDAO.GetByIdDeveloppeur(developpeur);
-				Utilisateur user = utilisateurDAO.GetById(developpeur.Id);
-				developpeur.Nom = user.Nom;
-				developpeur.Prenom = user.Prenom;
-				developpeur.Role = user.Role;
-				developpeur.Email = user.Email;
-				developpeur.MotDePasse = user.MotDePasse;
-			}
-
-			return developpeur;
 		}
 
         public Developpeur GetById(string id)
@@ -105,148 +122,206 @@ namespace ProjetNet.data
 
 		public List<Developpeur> GetDevByPro(Projet pro)
 		{
-			List<Developpeur> developpeurs = new List<Developpeur>();
+            try
+            {
+				if (connection.State != System.Data.ConnectionState.Open)
+				{
+					connection = DbConnectionFactory.GetOpenConnection();
 
-			command.Parameters.Clear();
-			command.CommandText = @"
+				}
+				List<Developpeur> developpeurs = new List<Developpeur>();
+				command.Connection = connection;
+				command.Parameters.Clear();
+                command.CommandText = @"
         SELECT d.id, d.technonlogies
         FROM Developpeur d
         WHERE d.projetId = @projetId";
 
-			command.Parameters.AddWithValue("@projetId", pro.Id);
+                command.Parameters.AddWithValue("@projetId", pro.Id);
 
-			using (var reader = command.ExecuteReader())
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var dev = new Developpeur
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("id")),
+                            Projet = pro,
+                            Technologies = reader.IsDBNull(reader.GetOrdinal("technonlogies"))
+                            ? new List<Technologie>()
+                            : reader.GetString(reader.GetOrdinal("technonlogies"))
+                                  .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                  .Select(t => Enum.TryParse(t.Trim(), true, out Technologie result) ? result : (Technologie?)null)
+                                  .Where(t => t.HasValue)
+                                  .Select(t => t.Value)
+                                  .ToList(),
+                            ServicesAssignes = new List<ServiceProjet>(),
+                            Taches = new List<Tache>()
+                        };
+
+
+
+                        // Ajout temporaire à la liste
+                        developpeurs.Add(dev);
+                    }
+                }
+
+                // Chargement des services et tâches pour chaque développeur
+                foreach (var dev in developpeurs)
+                {
+
+
+                    Utilisateur user = utilisateurDAO.GetById(dev.Id);
+                    dev.Nom = user.Nom;
+                    dev.Prenom = user.Prenom;
+                    dev.Role = user.Role;
+                    dev.Email = user.Email;
+                    dev.MotDePasse = user.MotDePasse;
+                }
+
+                return developpeurs;
+            }
+			finally
 			{
-				while (reader.Read())
+				if (rd != null && !rd.IsClosed)
+					rd.Close();
+
+				if (connection != null && connection.State == System.Data.ConnectionState.Open)
 				{
-					var dev = new Developpeur
-					{
-						Id = reader.GetInt32(reader.GetOrdinal("id")),
-						Projet = pro,
-						Technologies = rd.IsDBNull(rd.GetOrdinal("technonlogies"))
-						? new List<Technologie>()
-						: rd.GetString(rd.GetOrdinal("technonlogies"))
-							  .Split(',', StringSplitOptions.RemoveEmptyEntries)
-							  .Select(t => Enum.TryParse(t.Trim(), true, out Technologie result) ? result : (Technologie?)null)
-							  .Where(t => t.HasValue)
-							  .Select(t => t.Value)
-							  .ToList(),
-						ServicesAssignes = new List<ServiceProjet>(),
-						Taches = new List<Tache>()
-					};
-
+					connection.Close();
 					
-
-					// Ajout temporaire à la liste
-					developpeurs.Add(dev);
+					connection.Dispose();
+					command.Dispose();
 				}
 			}
-
-			// Chargement des services et tâches pour chaque développeur
-			foreach (var dev in developpeurs)
-			{
-				dev.ServicesAssignes = serviceDAO.getSerByDev(dev);
-				dev.Taches = tacheDAO.GetByIdDeveloppeur(dev);
-				Utilisateur user = utilisateurDAO.GetById(dev.Id);
-				dev.Nom = user.Nom;
-				dev.Prenom = user.Prenom;
-				dev.Role = user.Role;
-				dev.Email = user.Email;
-				dev.MotDePasse = user.MotDePasse;
-			}
-
-			return developpeurs;
 		}
 
 
 		public void Update(Developpeur entity)
         {
-            // 2. Mise à jour de la table Developpeur
-            command.Parameters.Clear();
-            command.CommandText = @"
+            try
+            {
+				if (connection.State != System.Data.ConnectionState.Open)
+				{
+					connection = DbConnectionFactory.GetOpenConnection();
+
+				}
+				command.Connection = connection;
+				// 2. Mise à jour de la table Developpeur
+				command.Parameters.Clear();
+                command.CommandText = @"
                     UPDATE Developpeur
                     SET projetId = @projetId,
-                        technologies = @technologies
+                        technonlogies = @technologies
                     WHERE id = @id";
 
-            command.Parameters.AddWithValue("@id", entity.Id);
-            command.Parameters.AddWithValue("@projetId", entity.Projet?.Id ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@id", entity.Id);
+                command.Parameters.AddWithValue("@projetId", entity.Projet?.Id ?? (object)DBNull.Value);
 
-            // Convertir la liste des technologies en chaîne séparée par virgule
-            string techString = entity.Technologies != null && entity.Technologies.Any()
-                ? string.Join(",", entity.Technologies.Select(t => t.ToString()))
-                : null;
+                // Convertir la liste des technologies en chaîne séparée par virgule
+                string techString = entity.Technologies != null && entity.Technologies.Any()
+                    ? string.Join(",", entity.Technologies.Select(t => t.ToString()))
+                    : null;
 
-            command.Parameters.AddWithValue("@technologies", (object?)techString ?? DBNull.Value);
+                command.Parameters.AddWithValue("@technologies", (object?)techString ?? DBNull.Value);
 
-            command.ExecuteNonQuery();
+                command.ExecuteNonQuery();
+            }
+			finally
+			{
+				if (rd != null && !rd.IsClosed)
+					rd.Close();
 
-
-        }
+				if (connection != null && connection.State == System.Data.ConnectionState.Open)
+				{
+					connection.Close();
+					
+					connection.Dispose();
+					command.Dispose();
+				}
+			}
+		}
 
 
 
         public List<Developpeur> GetByTechnos(List<Technologie> technologies)
         {
-            List<Developpeur> developpeurs = new List<Developpeur>();
-
-            if (technologies == null || technologies.Count == 0)
-                return developpeurs;
-
-            // Construire la condition SQL dynamiquement
-            List<string> conditions = new List<string>();
-            for (int i = 0; i < technologies.Count; i++)
+            try
             {
-                string paramName = $"@tech{i}";
-                conditions.Add($"technonlogies LIKE '%' + {paramName} + '%'");
-            }
+				if (connection.State != System.Data.ConnectionState.Open)
+				{
+					connection = DbConnectionFactory.GetOpenConnection();
 
-			string whereClause = $"({string.Join(" OR ", conditions)}) AND projetId IS NULL";
-			command.Parameters.Clear();
-            command.CommandText = $"SELECT * FROM Developpeur WHERE {whereClause}";
-
-            for (int i = 0; i < technologies.Count; i++)
-            {
-                command.Parameters.AddWithValue($"@tech{i}", technologies[i].ToString());
-            }
-
-            rd = command.ExecuteReader();
-            while (rd.Read())
-            {
-                Developpeur dev = new Developpeur
-                {
-                    Id = rd.GetInt32(rd.GetOrdinal("id")),
-                    Projet = rd.IsDBNull(rd.GetOrdinal("projetId")) ? null : new Projet { Id = rd.GetInt32(rd.GetOrdinal("projetId")) },
-                    Technologies = rd.IsDBNull(rd.GetOrdinal("technonlogies"))
-                        ? new List<Technologie>()
-                        : rd.GetString(rd.GetOrdinal("technonlogies"))
-                              .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                              .Select(t => Enum.TryParse(t.Trim(), true, out Technologie result) ? result : (Technologie?)null)
-                              .Where(t => t.HasValue)
-                              .Select(t => t.Value)
-                              .ToList()
-                };
-
-                developpeurs.Add(dev);
-            }
-
-            rd.Close();
-            foreach(Developpeur developpeur in developpeurs)
-            {
-                if(developpeur.Projet != null)
-                {
-					developpeur.Projet = projetDAO.GetById(developpeur.Projet.Id);
 				}
-                developpeur.ServicesAssignes = serviceDAO.getSerByDev(developpeur);
-                developpeur.Taches = tacheDAO.GetByIdDeveloppeur(developpeur);
-                Utilisateur user = utilisateurDAO.GetById(developpeur.Id);
-                developpeur.Nom = user.Nom;
-                developpeur.Prenom = user.Prenom;
-                developpeur.Role = user.Role;
-                developpeur.Email = user.Email;
-                developpeur.MotDePasse = user.MotDePasse;
+				command.Connection = connection;
+				List<Developpeur> developpeurs = new List<Developpeur>();
+
+                if (technologies == null || technologies.Count == 0)
+                    return developpeurs;
+
+                // Construire la condition SQL dynamiquement
+                List<string> conditions = new List<string>();
+                for (int i = 0; i < technologies.Count; i++)
+                {
+                    string paramName = $"@tech{i}";
+                    conditions.Add($"technonlogies LIKE '%' + {paramName} + '%'");
+                }
+
+                string whereClause = $"({string.Join(" OR ", conditions)}) AND projetId IS NULL";
+                command.Parameters.Clear();
+                command.CommandText = $"SELECT * FROM Developpeur WHERE {whereClause}";
+
+                for (int i = 0; i < technologies.Count; i++)
+                {
+                    command.Parameters.AddWithValue($"@tech{i}", technologies[i].ToString());
+                }
+
+                rd = command.ExecuteReader();
+                while (rd.Read())
+                {
+                    Developpeur dev = new Developpeur
+                    {
+                        Id = rd.GetInt32(rd.GetOrdinal("id")),
+                        Projet = rd.IsDBNull(rd.GetOrdinal("projetId")) ? null : new Projet { Id = rd.GetInt32(rd.GetOrdinal("projetId")) },
+                        Technologies = rd.IsDBNull(rd.GetOrdinal("technonlogies"))
+                            ? new List<Technologie>()
+                            : rd.GetString(rd.GetOrdinal("technonlogies"))
+                                  .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                  .Select(t => Enum.TryParse(t.Trim(), true, out Technologie result) ? result : (Technologie?)null)
+                                  .Where(t => t.HasValue)
+                                  .Select(t => t.Value)
+                                  .ToList()
+                    };
+
+                    developpeurs.Add(dev);
+                }
+
+                rd.Close();
+                foreach (Developpeur developpeur in developpeurs)
+                {
+
+                    Utilisateur user = utilisateurDAO.GetById(developpeur.Id);
+                    developpeur.Nom = user.Nom;
+                    developpeur.Prenom = user.Prenom;
+                    developpeur.Role = user.Role;
+                    developpeur.Email = user.Email;
+                    developpeur.MotDePasse = user.MotDePasse;
+                }
+                return developpeurs;
             }
-            return developpeurs;
-        }
+			finally
+			{
+				if (rd != null && !rd.IsClosed)
+					rd.Close();
+
+				if (connection != null && connection.State == System.Data.ConnectionState.Open)
+				{
+					connection.Close();
+					
+					connection.Dispose();
+					command.Dispose();
+				}
+			}
+		}
     }
 }

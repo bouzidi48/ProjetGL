@@ -37,15 +37,18 @@ namespace ProjetNet.Bussiness
 			}
 		}
 
+		public Projet GetByNom(string nom)
+		{
+			Projet pro = projetDAO.GetById(nom);
+			return pro;
+		}
+
 		public List<Projet> GetProjetParChef(int id)
 		{
 			return projetDAO.GetProjetByChefProjet(id);
 		}
 
-		public Projet GetProjetParDev(int id)
-		{
-			return projetDAO.GetByIdev(id);
-		}
+		
 
 		public List<Projet> GetProjetParDir(int id)
 		{

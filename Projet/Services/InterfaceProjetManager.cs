@@ -8,6 +8,7 @@ namespace ProjetNet.Services
 		void AffecterChefprojet(Projet projet);
 		List<Projet> ListerProjets();
 		Projet ConsulterProjet(int idProjet);
+		Projet GetByNom(string nom);
 		void ModifierProjet(Projet projet);
 
 		void SupprimerProjet(int id);
@@ -15,7 +16,6 @@ namespace ProjetNet.Services
 
 		List<Projet> GetProjetParChef(int id);
 
-		Projet GetProjetParDev(int id);
 
 		List<Projet> GetProjetParDir(int id);
 		

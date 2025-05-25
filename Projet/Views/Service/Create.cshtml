@@ -1,0 +1,79 @@
+﻿@model ProjetNet.Models.ServiceProjet
+
+@{
+    ViewData["Title"] = "Créer un ServiceProjet";
+    var allDeveloppeurs = ViewBag.Developpeurs as List<ProjetNet.Models.Developpeur>;
+    var projetId = ViewBag.ProjetId;
+}
+
+<h1 class="mt-4 text-primary">Créer un service projet</h1>
+
+<div class="card mt-4 shadow-sm p-4">
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Nom" class="form-label fw-bold">Nom du service</label>
+            <input asp-for="Nom" class="form-control" />
+            <span asp-validation-for="Nom" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="DescriptionService" class="form-label fw-bold">Description</label>
+            <textarea asp-for="DescriptionService" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="DescriptionService" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="DureeJours" class="form-label fw-bold">Durée (jours)</label>
+            <input asp-for="DureeJours" class="form-control" />
+            <span asp-validation-for="DureeJours" class="text-danger"></span>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-bold">Sélectionnez un développeur</label>
+            <table class="table table-bordered table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>Sélection</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Technologies</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var dev in allDeveloppeurs)
+                    {
+                        <tr>
+                            <td>
+                                <input type="radio" name="DeveloppeurId" value="@dev.Id" class="form-check-input" required />
+                            </td>
+                            <td>@dev.Nom</td>
+                            <td>@dev.Prenom</td>
+                            <td>@dev.Email</td>
+                            <td>@dev.Role</td>
+                            <td>
+                                @(dev.Technologies != null && dev.Technologies.Any()
+                                    ? string.Join(", ", dev.Technologies)
+                                    : "Aucune technologie")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Créer</button>
+            <a asp-action="AfficherServicesChefProjet" asp-controller="Service" asp-route-id="@projetId" class="btn btn-secondary ms-2">Retour</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

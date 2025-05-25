@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var userId = Context?.Session?.GetInt32("utilisateurId");
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -25,11 +28,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                        @if (TempData["utilisateurId"] != null)
+                        @if (userId != null)
                         {
                             <li class="nav-item">
                                 <form asp-controller="Utilisateur" asp-action="Signout" method="post" class="d-inline">
-                                    <button type="submit" class="nav-link btn btn-link text-dark border-0 p-0">Signout</button>
+                                    <button type="submit" class="nav-link text-dark">Signout</button>
                                 </form>
                             </li>
                         }

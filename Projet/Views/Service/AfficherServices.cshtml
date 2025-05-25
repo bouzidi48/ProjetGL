@@ -1,0 +1,49 @@
+﻿@model IEnumerable<ProjetNet.Models.ServiceProjet>
+
+@{
+    ViewData["Title"] = "Liste des services";
+}
+
+<h1 class="mt-4 text-primary">Liste des services</h1>
+
+@if (Model != null && Model.Any())
+{
+    <div class="card shadow-sm mt-4 p-4">
+        <h5 class="text-secondary mb-4">Services enregistrés</h5>
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nom du service</th>
+                    <th>Description</th>
+                    <th>Durée (jours)</th>
+                    <th>Développeur assigné</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var service in Model)
+                {
+                    <tr>
+                        <td>@(string.IsNullOrEmpty(service.Nom) ? "Non défini" : service.Nom)</td>
+                        <td>@(string.IsNullOrEmpty(service.DescriptionService) ? "Non définie" : service.DescriptionService)</td>
+                        <td>@(service.DureeJours.ToString() ?? "Non défini")</td>
+                        <td>
+                            @(service.DeveloppeurAssigne != null && !string.IsNullOrEmpty(service.DeveloppeurAssigne.Nom)
+                                ? service.DeveloppeurAssigne.Nom
+                                : "Aucun développeur assigné")
+                        </td>
+                       
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="mt-4 fst-italic text-muted">Aucun service à afficher pour le moment.</p>
+}
+
+<div class="mt-4">
+    <a asp-action="GetAllProject" asp-controller="Projet" class="btn btn-secondary">Retour à la liste des projets</a>
+</div>
